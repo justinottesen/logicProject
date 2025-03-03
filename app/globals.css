@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #e0e6f5;
+  --foreground: #171717;
+  --base:rgb(5, 26, 79);
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #3e3a3a;
+    --foreground: #ededed;
+  }
+} */
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.function-list {
+  display: grid;
+  grid-template-rows: repeat(auto-fill, 50px);
+  list-style-type: none;
+}
