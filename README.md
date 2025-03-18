@@ -2,7 +2,7 @@
 
 This is the repository containing the final project for CSCI 4420 - Computability & Logic, submitted by Justin Ottesen and Murray Copps. This project is a web app which assists users with Fitch-style proofs. After the user enters the premises and conclusion, at each step of the proof they will be prompted with an algorithm's best guess as to what the next step of the proof should be.
 
-## features
+## Features
 
 ### Roadmap
 
@@ -18,29 +18,47 @@ This is the repository containing the final project for CSCI 4420 - Computabilit
 
 ### Project Status
 
-| Feature              | Importance | Status | Notes                           |
-|----------------------|------------|--------|---------------------------------|
-| Fitch Recreation     | Required   | To Do  |
-| Patterns & Shortcuts | Required   | To Do  |
-| Step Scoring         | Required   | To Do  |
-| Look Ahead           | Bonus      | To Do  |
-| Informed Search      | Reach      | To Do  |
+| Feature              | Importance | Status       | Goal Date | Notes                                       |
+|----------------------|------------|--------------|-----------|---------------------------------------------|
+| Fitch Recreation     | Required   | In Progress  | 3/25/25   | Next step is rules, then proof verification |
+| Patterns & Shortcuts | Required   | To Do        | 4/1/25    |
+| Step Scoring         | Required   | To Do        | 4/8/25    |
+| Look Ahead           | Bonus      | To Do        | 4/15/25   |
+| Informed Search      | Reach      | To Do        | 4/22/25   |
+
+### Detailed Progress & Next Steps
+
+#### Fitch Recreation
+- [ ] Users can enter premises, proof, and conclusion steps
+- [ ] Users can create subproofs
+- [ ] Users can rearrange and delete steps / subproofs
+- [ ] Users can apply base rules to statements & cite supporting steps
+- [ ] App can validate user input and verify statement syntax
+- [ ] App can validate proper application of rules
+- [ ] App can validate all rules in succession to verify correctness of a proof
 
 ## Setup Instructions
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ### Getting Started
 
-First, run the development server:
+> These instructions assume you are on ubuntu which is what I use, @murraycopps maybe you can give windows instructions?
+
+Make sure npm is installed:
+
+```bash
+sudo apt update && sudo apt install npm 
+```
+
+Install dependencies:
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
