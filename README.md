@@ -1,6 +1,35 @@
+# Formal Proof Helper
+
+This is the repository containing the final project for CSCI 4420 - Computability & Logic, submitted by Justin Ottesen and Murray Copps. This project is a web app which assists users with Fitch-style proofs. After the user enters the premises and conclusion, at each step of the proof they will be prompted with an algorithm's best guess as to what the next step of the proof should be.
+
+## features
+
+### Roadmap
+
+1. **Fitch Recreation** - The first step is to recreate a Fitch-style proof interface. This includes premises, conclusions, steps with justifications, introduction and elimination rules, and verifying correctness of steps and proofs.
+
+2. **Patterns & Shortcuts** - There are many common patterns which can be used to take shortcuts, for example excluded middle, which can be proven using elimination and introduction rules. There will be some sort of store of these which can be used as lemmas in proofs.
+
+3. **Step Scoring** - Next, we will generate a list of possible next steps (or lemmas as mentioned above) to take. These will be ordered using a simple scoring algorithm based on some version of edit distance to the conclusion statement.
+
+4. **Look Ahead** - Now that we have a way of scoring steps, we can calculate scores using a breadth first search algorithm, which scores each state using the best possible score of any reachable state from the current state.
+
+5. **Informed Search** - We can improve on our search algorithm by expanding possible choices according to some heuristic, possibly something as simple as our previous scoring heuristic, rather than just what we happen to expand first.
+
+### Project Status
+
+| Feature              | Importance | Status | Notes                           |
+|----------------------|------------|--------|---------------------------------|
+| Fitch Recreation     | Required   | To Do  |
+| Patterns & Shortcuts | Required   | To Do  |
+| Step Scoring         | Required   | To Do  |
+| Look Ahead           | Bonus      | To Do  |
+| Informed Search      | Reach      | To Do  |
+
+## Setup Instructions
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+### Getting Started
 
 First, run the development server:
 
@@ -20,7 +49,7 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+### Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
@@ -29,7 +58,7 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+### Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
