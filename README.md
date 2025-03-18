@@ -29,9 +29,9 @@ This is the repository containing the final project for CSCI 4420 - Computabilit
 ### Detailed Progress & Next Steps
 
 #### Fitch Recreation
-- [ ] Users can enter premises, proof, and conclusion steps
-- [ ] Users can create subproofs
-- [ ] Users can rearrange and delete steps / subproofs
+- [x] Users can enter premises, proof, and conclusion steps
+- [x] Users can create subproofs
+- [x] Users can rearrange and delete steps / subproofs
 - [ ] Users can apply base rules to statements & cite supporting steps
 - [ ] App can validate user input and verify statement syntax
 - [ ] App can validate proper application of rules
