@@ -1,37 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import InputBox from "./InputBox";
+import Proof from "./components/Proof";
 
-const defaultNum = 3;
 export default function Home() {
-  const [texts, setTexts] = useState(new Array(defaultNum).fill(""));
-  const [rules, setRules] = useState(new Array(defaultNum).fill(""));
-  const [output, setOutput] = useState("");
-
-  useEffect(() => {
-    setOutput(texts.join(""));
-  }, [texts]);
-  const setText = (i: number, text: string) =>
-    setTexts([...texts.slice(0, i), text, ...texts.slice(i + 1)]);
-
-  const setRule = (i: number, rule: string) =>
-    setRules([...rules.slice(0, i), rule, ...rules.slice(i + 1)]);
+  const [conclusion, setConclusion] = useState<string>("");
 
   return (
-    <ul className="function-list p-2 gap-1 flex-grow">
-      {texts.map((text, i) => (
-        <InputBox
-          key={i}
-          text={text}
-          setText={(text) => setText(i, text)}
-          rule={rules[i]}
-          setRule={(rule) => setRule(i, rule)}
+    <div className="flex flex-col w-full min-h-screen">
+      <section className="flex-1 border p-4 overflow-auto">
+        <h2 className="text-xl font-bold mb-4">Proof</h2>
+        <Proof/>
+      </section>
+
+      {/* Bottom Section - Proof Statement */}
+      <section className="bg-gray-300 p-4">
+        <h2 className="text-lg font-bold">Conclusion Statement</h2>
+        <input
+          type="text"
+          value={conclusion}
+          onChange={(e) => setConclusion(e.target.value)}
+          className="w-full p-2 border border-gray-400 rounded"
+          placeholder="Conclusion statement"
         />
-      ))}
-      <li>
-        <p>{output}</p>
-      </li>
-    </ul>
+      </section>
+    </div>
   );
 }
