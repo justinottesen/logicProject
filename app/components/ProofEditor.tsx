@@ -1,8 +1,9 @@
 'use client';
 
-import React from "react";
+import React, { use, useEffect } from "react";
 import { Proof, Step } from "@lib/logic/proof";
 import StepEditor from "@components/StepEditor";
+import { replaceSubstitutions } from "@/lib/logic/substitutions";
 
 type ProofEditorProps = {
   proof: Proof;
@@ -67,6 +68,35 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       ],
     });
   };
+
+  // add the substutions to the proof
+  useEffect (() => {
+    let changed = false
+    const oldPremises = proof.premises
+    for(const premise of oldPremises) {
+      const oldRaw = premise.raw
+      premise.raw = replaceSubstitutions(premise.raw)
+      if(oldRaw !== premise.raw) {
+        changed = true
+      }
+    }
+
+    const oldSteps = proof.steps
+    for(const step of oldSteps) {
+      if(step.type === "line") {
+        const oldRaw = step.raw
+        step.raw = replaceSubstitutions(step.raw)
+        if(oldRaw !== step.raw) {
+          changed = true
+        }
+      }
+    }
+
+    if(changed) {
+      setProof({...proof})
+    }
+    
+  }, [proof])
 
   return (
     <div className="flex flex-col gap-6">
