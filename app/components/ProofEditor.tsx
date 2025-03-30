@@ -1,8 +1,8 @@
 'use client';
 
 import React from "react";
-import { Proof, Step, Statement } from "../proof";
-import StepEditor from "./StepEditor";
+import { Proof, Step } from "@lib/logic/proof";
+import StepEditor from "@components/StepEditor";
 
 type ProofEditorProps = {
   proof: Proof;

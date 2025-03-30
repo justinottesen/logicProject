@@ -1,4 +1,4 @@
-import { Formula } from "./logic";
+import { Formula } from "@lib/logic/logic";
 
 // === Step Types ===
 

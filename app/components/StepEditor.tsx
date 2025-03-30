@@ -1,6 +1,6 @@
-import { Step, Statement, Proof } from "../proof";
-import StatementEditor from "./StatementEditor";
-import ProofEditor from "./ProofEditor";
+import { Step } from "@lib/logic/proof";
+import StatementEditor from "@components/StatementEditor";
+import ProofEditor from "@components/ProofEditor";
 
 type StepEditorProps = {
   step: Step;

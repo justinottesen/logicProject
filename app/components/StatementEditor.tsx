@@ -1,4 +1,4 @@
-import { Statement } from "../proof";
+import { Statement } from "@lib/logic/proof";
 
 // Temporary parser
 const parseFormulaInput = (raw: string) => ({

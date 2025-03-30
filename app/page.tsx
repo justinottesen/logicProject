@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import ProofEditor from "./components/ProofEditor";
-import { Proof, Statement } from "./proof";
+import { Proof, Statement } from "./lib/logic/proof";
 
 export default function Home() {
   const [proof, setProof] = useState<Proof>({
