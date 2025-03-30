@@ -1,5 +1,7 @@
 // === Term-level: Constants and Variables ===
 
+import exp from "constants";
+
 export type Constant = {
   type: "constant";
   name: string; // e.g., "alice", "a"
@@ -26,31 +28,50 @@ export type Predicate = {
 export type Not = {
   type: "not";
   operand: Formula;
+  value: '¬'; 
 };
 
 export type And = {
   type: "and";
   left: Formula;
   right: Formula;
+  value: '∧';
 };
 
 export type Or = {
   type: "or";
   left: Formula;
   right: Formula;
+  value: '∨';
 };
 
 export type Implies = {
   type: "implies";
   left: Formula;
   right: Formula;
+  value: '→';
 };
 
 export type Iff = {
   type: "iff";
   left: Formula;
   right: Formula;
+  value: '↔';
 };
+
+export type Equals = {
+  type: "equals";
+  left: Formula;
+  right: Formula;
+  value: '=';
+}
+
+export type NotEquals = {
+  type: "notequals";
+  left: Formula;
+  right: Formula;
+  value: '∃';
+}
 
 export type BinaryConnective = And | Or | Implies | Iff;
 
@@ -60,12 +81,14 @@ export type ForAll = {
   type: "forall";
   variable: Variable;
   body: Formula;
+  value: '∀';
 };
 
 export type Exists = {
   type: "exists";
   variable: Variable;
   body: Formula;
+  value: '∃';
 };
 
 export type Quantifier = ForAll | Exists;
