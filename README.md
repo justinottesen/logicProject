@@ -18,12 +18,12 @@ This is the repository containing the final project for CSCI 4420 - Computabilit
 
 ### Project Status
 
-| Feature              | Importance | Status       | Goal Date | Notes                                       |
-|----------------------|------------|--------------|-----------|---------------------------------------------|
-| Fitch Recreation     | Required   | In Progress  | 3/25/25   | Next step is rules, then proof verification |
-| Patterns & Shortcuts | Required   | To Do        | 4/1/25    |
-| Step Scoring         | Required   | To Do        | 4/8/25    |
-| Look Ahead           | Bonus      | To Do        | 4/15/25   |
+| Feature              | Importance | Status       | Goal Date |
+|----------------------|------------|--------------|-----------|
+| Fitch Recreation     | Required   | In Progress  | 4/1/25    |
+| Patterns & Shortcuts | Required   | To Do        | 4/8/25    |
+| Step Scoring         | Required   | To Do        | 4/15/25   |
+| Look Ahead           | Bonus      | To Do        | 4/22/25   |
 | Informed Search      | Reach      | To Do        | 4/22/25   |
 
 ### Detailed Progress & Next Steps
@@ -31,7 +31,7 @@ This is the repository containing the final project for CSCI 4420 - Computabilit
 #### Fitch Recreation
 - [x] Users can enter premises, proof, and conclusion steps
 - [x] Users can create subproofs
-- [x] Users can rearrange and delete steps / subproofs
+- [ ] Users can rearrange and delete steps / subproofs
 - [ ] Users can apply base rules to statements & cite supporting steps
 - [ ] App can validate user input and verify statement syntax
 - [ ] App can validate proper application of rules
