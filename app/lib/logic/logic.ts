@@ -70,7 +70,7 @@ export type NotEquals = {
   type: "notequals";
   left: Formula;
   right: Formula;
-  value: '∃';
+  value: '≠';
 }
 
 export type BinaryConnective = And | Or | Implies | Iff;
