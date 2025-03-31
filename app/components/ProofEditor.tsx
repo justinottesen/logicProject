@@ -62,8 +62,12 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       steps: [
         ...proof.steps,
         {
-          type: "proof",
-          premises: [],
+          type: "subproof",
+          premise: {
+            type: "line",
+            raw: "",
+            result: parseFormulaInput("")
+          },
           steps: [],
         },
       ],
@@ -139,6 +143,11 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
           </div>
         </div>
       </div>
+
+      <p>
+        TODO: Add the goals & conclusion at the bottom. I put it in the proof type. See the
+        other TODO that shows up when you click Add subproof.
+      </p>
     </div>
   );
 }
