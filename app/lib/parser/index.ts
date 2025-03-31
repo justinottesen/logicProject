@@ -4,6 +4,6 @@ export function parseFormulaInput(raw: string): ParsedFormula {
   // Replace this with your real parser
   return {
     status: "error",
-    error: "Not Yet Implemented",
+    error: "Not Yet Implemented - raw: " + raw,
   };
 }

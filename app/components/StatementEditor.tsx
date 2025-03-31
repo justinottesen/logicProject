@@ -1,10 +1,5 @@
+import { parseFormulaInput } from "@/lib/parser";
 import { Statement } from "@lib/logic/proof";
-
-// Temporary parser
-const parseFormulaInput = (raw: string) => ({
-  status: "error" as const,
-  error: "Parser Not Yet Implemented",
-});
 
 type StatementEditorProps = {
   statement: Statement;

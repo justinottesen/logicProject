@@ -1,7 +1,5 @@
 // === Term-level: Constants and Variables ===
 
-import exp from "constants";
-
 export type Constant = {
   type: "constant";
   name: string; // e.g., "alice", "a"

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Proof, Step } from "@lib/logic/proof";
 import StepEditor from "@components/StepEditor";
 import { replaceSubstitutions } from "@/lib/logic/substitutions";
+import { parseFormulaInput } from "@/lib/parser";
 
 type ProofEditorProps = {
   proof: Proof;
@@ -16,7 +17,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
     newPremises[index] = {
       type: "line",
       raw,
-      result: { status: "error", error: "Parser Not Yet Implemented" },
+      result: parseFormulaInput(raw),
     };
     setProof({ ...proof, premises: newPremises });
   };
@@ -29,7 +30,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
         {
           type: "line",
           raw: "",
-          result: { status: "error", error: "Parser Not Yet Implemented" },
+          result: parseFormulaInput(""),
         },
       ],
     });
@@ -49,7 +50,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
         {
           type: "line",
           raw: "",
-          result: { status: "error", error: "Parser Not Yet Implemented" },
+          result: parseFormulaInput(""),
         },
       ],
     });
@@ -96,7 +97,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       setProof({...proof})
     }
     
-  }, [proof])
+  }, [proof, setProof])
 
   return (
     <div className="flex flex-col gap-6">
