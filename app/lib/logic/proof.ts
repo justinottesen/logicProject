@@ -16,6 +16,7 @@ export type Statement = {
 
 export type ParsedFormula = 
   | { status: "ok"; formula: Formula }
+  | { status: "empty" }
   | { status: "error"; error: string };
 
 export type Step = Statement | Subproof;
