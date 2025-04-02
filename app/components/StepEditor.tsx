@@ -1,6 +1,6 @@
 import { Step } from "@lib/logic/proof";
 import StatementEditor from "@components/StatementEditor";
-import ProofEditor from "@components/ProofEditor";
+import SubproofEditor from "./SubproofEditor";
 
 type StepEditorProps = {
   step: Step;
@@ -17,12 +17,10 @@ export default function StepEditor({ step, updateStep }: StepEditorProps) {
     );
   } else {
     return (
-      <div className="border-l-2 pl-4 ml-2">
-        <ProofEditor
-          proof={step}
-          setProof={(updated) => updateStep(updated)}
-        />
-      </div>
+      <SubproofEditor
+        // subproof={step}
+        // onChange={updateStep}
+      />
     );
   }
 }
