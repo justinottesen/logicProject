@@ -17,5 +17,5 @@ dev = [
 ]
 
 [project.scripts]
-proof_helper = "proof_helper.cli:main"
+proof_cli = "proof_helper.cli:main"
 proof_server = "proof_helper.server:main"
