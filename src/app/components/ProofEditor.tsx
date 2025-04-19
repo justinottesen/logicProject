@@ -18,6 +18,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       type: "line",
       raw,
       result: parseFormulaInput(raw),
+      rule: "none",
     };
     setProof({ ...proof, premises: newPremises });
   };
@@ -31,6 +32,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
           type: "line",
           raw: "",
           result: parseFormulaInput(""),
+          rule: "none",
         },
       ],
     });
@@ -51,6 +53,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
           type: "line",
           raw: "",
           result: parseFormulaInput(""),
+          rule: "∧Elim",
         },
       ],
     });
@@ -66,12 +69,19 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
           premise: {
             type: "line",
             raw: "",
-            result: parseFormulaInput("")
+            result: parseFormulaInput(""),
+            rule: "none",
           },
           steps: [],
         },
       ],
     });
+  };
+
+  const deleteStep = (index: number) => {
+    const newSteps = [...proof.steps];
+    newSteps.splice(index, 1);
+    setProof({ ...proof, steps: newSteps });
   };
 
   // add the substutions to the proof
@@ -131,6 +141,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
               key={i}
               step={step}
               updateStep={(updated) => updateStepAt(i, updated)}
+              deleteStep={() => deleteStep(i)}
             />
           ))}
           <div className="flex gap-4 mt-2">

@@ -1,62 +1,62 @@
-import { Step, Proof } from "../../proof"
+import { Statement, Subproof } from "../../proof"
 
 
-//switch proof to subproof
+//switch Subproof to subSubproof
 
 
 
 export type ConjectionElim = {
     name: '∧Elim';
-    parents: Step;
+    parents: Statement;
     symbol: '∧';
 }
 
 export type DisjunctionElim = {
     name: '∨Elim';
-    parents: [Step, ...Proof[]];
+    parents: [Statement, ...Subproof[]];
     minLength: 2;
     symbol: '∨';
 }
 
 export type NegationElim = {
     name: '¬Elim';
-    parents: Step;
+    parents: Statement;
     symbol: '¬';
 }
     
 export type FalseElim = {
     name: '⊥Elim'
-    parents: Step;
+    parents: Statement;
     symbol: '⊥';
 }
 
 export type ConditionalElim = {
     name: '→Elim';
-    parents: [Step, Step];
+    parents: [Statement, Statement];
     symbol: '→';
 }
 
 export type BiconditionalElim = {
     name: '↔Elim';
-    parents: [Step, Step];
+    parents: [Statement, Statement];
     symbol: '↔';
 }
 
 export type IdentityElim = {
     name: '⊥Elim';
-    parents: Step;
+    parents: Statement;
     symbol: '⊥';
 }
 
 export type UniversalElim = {
     name: '∀Elim';
-    parents: Step;
+    parents: Statement;
     symbol: '∀';
 }
 
 export type ExistentialElim = {
     name: '∃Elim';
-    parents: [Step, Proof];
+    parents: [Statement, Subproof];
     symbol: '∃';
 }
 
