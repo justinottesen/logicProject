@@ -12,6 +12,7 @@ export type Statement = {
   type: "line";
   raw: string;
   result: ParsedFormula;
+  rule: string;
 };
 
 export type ParsedFormula = 
