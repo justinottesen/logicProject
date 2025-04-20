@@ -8,6 +8,7 @@ import { text } from "stream/consumers";
 
 type SubproofEditorProps = {
   subproof: Subproof;
+  parents: Step[];
   onChange: (updated: Subproof) => void;
   deleteSubproof: () => void;
 };

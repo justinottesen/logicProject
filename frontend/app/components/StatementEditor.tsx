@@ -4,6 +4,7 @@ import { rules } from "@lib/logic/rules";
 
 type StatementEditorProps = {
   statement: Statement;
+  parents: Step[];
   onChange: (updated: Statement) => void;
   deleteStatement: () => void;
   deleteStatement: () => void;
