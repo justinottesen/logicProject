@@ -9,7 +9,7 @@ export default function Home() {
     type: "proof",
     premises: [],
     steps: [],
-    goals: []
+    goals: [],
   });
 
   return (

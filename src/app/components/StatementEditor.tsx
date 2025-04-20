@@ -20,6 +20,7 @@ export default function StatementEditor({
 
   return (
     <div className="flex flex-row w-full h-full">
+      <div className="h-full p-1 text-lg">{statement.number}</div>
       <input
         value={statement.raw}
         onChange={(e) => handleChange(e.target.value)}

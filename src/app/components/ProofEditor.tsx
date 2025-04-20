@@ -19,6 +19,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw,
       result: parseFormulaInput(raw),
       rule: "none",
+      parents: [],
+      number: proof.premises[index].number,
     };
     setProof({ ...proof, premises: newPremises });
   };
@@ -33,6 +35,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
           raw: "",
           result: parseFormulaInput(""),
           rule: "none",
+          parents: [],
+          number: proof.premises.length + 1,
         },
       ],
     });
@@ -54,6 +58,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
           raw: "",
           result: parseFormulaInput(""),
           rule: "∧Elim",
+          parents: [],
+          number: proof.steps.length + 1,
         },
       ],
     });
@@ -71,8 +77,12 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
             raw: "",
             result: parseFormulaInput(""),
             rule: "none",
+            parents: [],
+            number: proof.steps.length + 1,
           },
           steps: [],
+          constants: [],
+          number: proof.steps.length + 1,
         },
       ],
     });

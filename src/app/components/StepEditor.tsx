@@ -23,6 +23,7 @@ export default function StepEditor({ step, updateStep, deleteStep }: StepEditorP
         subproof={step}
         onChange={updateStep}
         deleteSubproof={deleteStep}
+        
       />
     );
   }
