@@ -1,9 +1,10 @@
 import { parseFormulaInput } from "@lib/parser";
-import { Statement } from "@lib/logic/proof";
+import { Statement, Step } from "@lib/logic/proof";
 import { rules } from "@lib/logic/rules";
 
 type StatementEditorProps = {
   statement: Statement;
+  parents: Step[];
   onChange: (updated: Statement) => void;
   deleteStatement: () => void;
 };

@@ -1,4 +1,4 @@
-import { Constant, Formula } from "frontend/app/lib/logic/logic";
+import { Constant, Formula } from "@lib/logic/logic";
 
 // === Step Types ===
 
