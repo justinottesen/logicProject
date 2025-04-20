@@ -16,6 +16,7 @@ export default function SubproofEditor({
   subproof,
   onChange,
   deleteSubproof,
+  
 }: SubproofEditorProps) {
   const updateStepAt = (index: number, updated: Step) => {
     const newSteps = [...subproof.steps];
@@ -33,6 +34,8 @@ export default function SubproofEditor({
           raw: "",
           result: parseFormulaInput(""),
           rule: "∧Elim",
+          parents: [],
+          number: subproof.steps.length + 1,
         },
       ],
     });
@@ -50,8 +53,12 @@ export default function SubproofEditor({
             raw: "",
             result: parseFormulaInput(""),
             rule: "none",
+            parents: [],
+            number: subproof.steps.length + 1,
           },
           steps: [],
+          constants: [],
+          number: subproof.steps.length + 1,
         },
       ],
     });
@@ -74,6 +81,7 @@ export default function SubproofEditor({
   return (
     <div className="flex flex-col gap-2 pl-4 sub relative">
       <div className="flex flex-row w-full h-full mb-2">
+        <div className="h-full p-1 text-lg">{subproof.number}</div>
         <input
           type="text"
           value={subproof.premise.raw}
