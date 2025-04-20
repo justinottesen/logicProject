@@ -1,7 +1,7 @@
 // app/lib/parser/parser.ts
 
 import { Token } from "./tokenizer";
-import { Formula, Predicate, Term } from "@/lib/logic/logic";
+import { Formula, Predicate, Term } from "frontend/app/lib/logic/logic";
 
 export class Parser {
   private tokens: Token[];

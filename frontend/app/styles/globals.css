@@ -6,14 +6,11 @@
   --background: #e0e6f5;
   --foreground: #171717;
   --base:rgb(5, 26, 79);
+  --dark-base: rgb(2, 17, 55);
+  --light-base: rgb(11, 43, 123);
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #3e3a3a;
-    --foreground: #ededed;
-  }
-} */
+
 
 body {
   color: var(--foreground);
@@ -25,4 +22,39 @@ body {
   display: grid;
   grid-template-rows: repeat(auto-fill, 50px);
   list-style-type: none;
+}
+
+.bg-base {
+  background-color: var(--base);
+}
+
+:hover.hover-bg-dark-base {
+  background-color: var(--dark-base);
+}
+
+
+
+.sub{
+  position: relative;
+}
+.sub::before {
+  content: '';
+  position: absolute;
+  width: .5rem;
+  height: 100%;
+  background-color: var(--base);
+  border-radius: .25rem;
+  top: 0rem;
+  left: 0rem;
+}
+.sub::after { 
+  content: '';
+  position: absolute;
+  width: 10rem;
+  height: .5rem;
+  background-color: var(--base);
+  border-top-right-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+  top: 2.25rem;
+  left: 0rem;
 }

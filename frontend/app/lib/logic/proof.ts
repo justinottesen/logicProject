@@ -1,4 +1,4 @@
-import { Formula } from "@lib/logic/logic";
+import { Constant, Formula } from "@lib/logic/logic";
 
 // === Step Types ===
 
@@ -6,12 +6,17 @@ export type Subproof = {
   type: "subproof";
   premise: Statement;
   steps: Step[];
+  constants: Constant[];
+  number: number;
 }
 
 export type Statement = {
   type: "line";
   raw: string;
   result: ParsedFormula;
+  rule: string;
+  parents: Statement[];
+  number: number;
 };
 
 export type ParsedFormula = 

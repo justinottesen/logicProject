@@ -1,13 +1,13 @@
-import { Step, Proof } from "../../proof"
+import { Statement, Subproof } from "../../proof"
 
 export type PeanoInduction = {
     name: 'Peano Induction';
-    parents: [Step, Proof];
+    parents: [Statement, Subproof];
     symbol: 'P-Ind';
 }
 
 export type StrongInduction = {
     name: 'Strong Induction';
-    parents: Proof;
+    parents: Subproof;
     symbol: 'S-Ind';
 }

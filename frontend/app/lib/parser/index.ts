@@ -1,5 +1,5 @@
-import { Formula } from "@/lib/logic/logic";
-import { ParsedFormula } from "@/lib/logic/proof";
+import { Formula } from "frontend/app/lib/logic/logic";
+import { ParsedFormula } from "frontend/app/lib/logic/proof";
 import { tokenize } from "./tokenizer";
 import { Parser } from "./parser";
 

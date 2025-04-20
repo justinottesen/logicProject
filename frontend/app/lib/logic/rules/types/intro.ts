@@ -1,40 +1,40 @@
-import { Step, Proof } from "../../proof"
+import { Statement, Subproof } from "../../proof"
 
 export type ConjectionIntro = {
     name: '∧Intro';
-    parents: Step[];
+    parents: Statement[];
     symbol: '∧';
     minLength: 2;
 }
 
 export type DisjunctionIntro = {
     name: '∨Intro';
-    parents: Step[];
+    parents: Statement[];
     symbol: '∨';
     minLength: 2;
 }
 
 export type NegationIntro = {
     name: '¬Intro';
-    parents: Proof;
+    parents: Subproof;
     symbol: '¬';
 } 
 
 export type FalseIntro = {
     name: '⊥Intro';
-    parents: [Step, Step];
+    parents: [Statement, Statement];
     symbol: '⊥';
 }
 
 export type ConditionalIntro = {
     name: '→Intro';
-    parents: Proof;
+    parents: Subproof;
     symbol: '→';
 }
 
 export type BiconditionalIntro = {
     name: '↔Intro';
-    parents: [Proof, Proof];
+    parents: [Subproof, Subproof];
     symbol: '↔';
 }
 
@@ -45,12 +45,12 @@ export type IdentityIntro = {
 
 export type UniversalIntro = {
     name: '∀Intro';
-    parents: Proof;
+    parents: Subproof;
     symbol: '∀';
 }
 
 export type ExistentialIntro = {
     name: '∃Intro';
-    parents: Step;
+    parents: Statement;
     symbol: '∃';
 }

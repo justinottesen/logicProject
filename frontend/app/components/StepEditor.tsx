@@ -5,21 +5,25 @@ import SubproofEditor from "./SubproofEditor";
 type StepEditorProps = {
   step: Step;
   updateStep: (updated: Step) => void;
+  deleteStep: () => void;
 };
 
-export default function StepEditor({ step, updateStep }: StepEditorProps) {
+export default function StepEditor({ step, updateStep, deleteStep }: StepEditorProps) {
   if (step.type === "line") {
     return (
       <StatementEditor
         statement={step}
         onChange={(updated) => updateStep(updated)}
+        deleteStatement={deleteStep}
       />
     );
   } else {
     return (
       <SubproofEditor
-        // subproof={step}
-        // onChange={updateStep}
+        subproof={step}
+        onChange={updateStep}
+        deleteSubproof={deleteStep}
+        
       />
     );
   }
