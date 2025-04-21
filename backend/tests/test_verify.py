@@ -166,3 +166,41 @@ def test_invalid_proof_with_wrong_conclusion():
     checker = RuleChecker()
 
     assert not verify_proof(proof, checker)
+
+def test_invalid_premise_rule():
+    P = Variable("P")
+    bad_premise = stmt("1", P, rule="∨ Introduction")  # not Assumption
+    proof = Proof(premises=[bad_premise], steps=[], conclusions=[])
+    checker = RuleChecker()
+    assert not verify_proof(proof, checker)
+
+def test_invalid_conclusion_rule():
+    P = Variable("P")
+    good = stmt("1", P, rule="Assumption")
+    derived = stmt("2", P, rule="Reiteration", premises=[sid("1")])
+    bad_conclusion = stmt("3", P, rule="∧ Introduction", premises=[sid("1"), sid("1")])
+    proof = Proof(premises=[good], steps=[derived], conclusions=[bad_conclusion])
+    checker = RuleChecker()
+    assert not verify_proof(proof, checker)
+
+def test_invalid_subproof_assumption_rule():
+    P = Variable("P")
+    assume = stmt("1.1", P, rule="¬ Introduction")  # not Assumption
+    step = stmt("1.2", Bottom(), rule="⊥ Introduction", premises=[sid("1.1"), sid("1.1")])
+    sp = subproof("1", assume, [step])
+    reiterate = stmt("2", Bottom(), rule="Reiteration", premises=[sid("1.2")])
+    proof = Proof(premises=[], steps=[assume, step, sp, reiterate], conclusions=[reiterate])
+    checker = RuleChecker()
+    assert not verify_proof(proof, checker)
+
+def test_valid_conjunction_with_reiteration():
+    P = Variable("P")
+    Q = Variable("Q")
+
+    a = stmt("1", P, rule="Assumption")
+    b = stmt("2", Q, rule="Assumption")
+    conj = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    reiterate = stmt("4", And(P, Q), rule="Reiteration", premises=[sid("3")])
+    proof = Proof(premises=[a, b], steps=[conj], conclusions=[reiterate])
+    checker = RuleChecker()
+    assert verify_proof(proof, checker)
