@@ -34,24 +34,7 @@ export default function StatementEditor({
         className="border px-2 py-1 rounded flex-grow-1"
         placeholder="Parents (1,2,3)"
       />
-      <select
-        value={statement.rule}
-        onChange={(e) => onChange({ ...statement, rule: e.target.value })}
-        className="border px-2 py-1 rounded ml-2"
-      >
-        {rules.map((rule) => (
-          <option key={"statment-rule-" + rule} value={rule}>
-            {rule}
-          </option>
-        ))}
-      </select>
-      <button
-        className="ml-2 border px-2 py-1 rounded bg-base hover-bg-dark-base text-white"
-        onClick={deleteStatement}
-      >
-        Delete
-      </button>
-
+      
       <select
         value={statement.rule}
         onChange={(e) => onChange({ ...statement, rule: e.target.value })}

@@ -7,7 +7,6 @@ export type Subproof = {
   premise: Statement;
   raw: string;
   steps: Step[];
-  constants: Constant[];
   constantsRaw: string;
   number: number;
 }

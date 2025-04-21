@@ -133,7 +133,6 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
             },
             steps: [],
             raw: "",
-            constants: [],
             constantsRaw: "",
             number: 0,
           },

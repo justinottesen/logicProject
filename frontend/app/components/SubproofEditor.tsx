@@ -63,7 +63,6 @@ export default function SubproofEditor({
               number: subproof.steps.length + 1,
             },
             steps: [],
-            constants: [],
             constantsRaw: "",
             raw: "",
             number: subproof.steps.length + 1,
@@ -83,24 +82,7 @@ export default function SubproofEditor({
     onChange({ ...subproof, premise: updatedPremise });
   };
 
-  const changeConstants = (text: string) => {
-    const constants = text
-      .split(",")
-      .map((v) => v.trim())
-      .filter((v) => v !== "");
-    const updatedSubproof = {
-      ...subproof,
-      constants: constants.map(
-        (v, i) =>
-          ({
-            type: "constant",
-            name: v,
-          } as Constant)
-      ),
-      constantsRaw: text,
-    };
-    onChange(updatedSubproof, true);
-  };
+
   const deleteStep = (index: number) => {
     const newSteps = [...subproof.steps];
     newSteps.splice(index, 1);
@@ -117,13 +99,7 @@ export default function SubproofEditor({
           className="px-2 py-1 rounded flex-grow-3"
           placeholder="Subproof Premise"
         />
-        <input
-          type="text"
-          value={subproof.constantsRaw}
-          onChange={(e) => changeConstants(e.target.value)}
-          className="px-2 py-1 rounded flex-grow-1"
-          placeholder="Constants (a,b,c)"
-        />
+        
         <button
           className="ml-2 border px-2 py-1 rounded bg-base hover-bg-dark-base text-white"
           onClick={deleteSubproof}
