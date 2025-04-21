@@ -1,91 +1,152 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Proof, Step } from "@lib/logic/proof";
+import { Proof, Step, ProofStep, Premise, Goal } from "@lib/logic/proof";
 import StepEditor from "@components/StepEditor";
 import { replaceSubstitutions } from "@lib/logic/substitutions";
 import { parseFormulaInput } from "@lib/parser";
 
 type ProofEditorProps = {
   proof: Proof;
-  setProof: (proof: Proof) => void;
+  setProof: (proof: Proof, changeNumber?: boolean) => void;
 };
 
 export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
-  const updatePremise = (index: number, raw: string) => {
+  const updatePremiseRaw = (index: number, raw: string) => {
+    console.log("Updating premise", index, "to", raw);
     const newPremises = [...proof.premises];
     newPremises[index] = {
-      type: "line",
+      type: "premise",
       raw,
       result: parseFormulaInput(raw),
       rule: "none",
-      parents: [],
-      number: proof.premises[index].number,
+      number: index + 1,
     };
     setProof({ ...proof, premises: newPremises });
   };
 
-  const addPremise = () => {
-    setProof({
-      ...proof,
-      premises: [
-        ...proof.premises,
-        {
-          type: "line",
-          raw: "",
-          result: parseFormulaInput(""),
-          rule: "none",
-          parents: [],
-          number: proof.premises.length + 1,
-        },
-      ],
-    });
+  const updateGoalRaw = (index: number, raw: string) => {
+    const newGoals = [...proof.goals];
+    newGoals[index] = {
+      type: "goal",
+      raw,
+      result: parseFormulaInput(raw),
+      rule: "none",
+      number: index + 1,
+    };
+    setProof({ ...proof, goals: newGoals });
   };
 
-  const updateStepAt = (index: number, updated: Step) => {
+  const addPremise = () => {
+    const p = {
+      type: "premise",
+      raw: "",
+      result: parseFormulaInput(""),
+      rule: "none",
+      number: 0,
+    } as Premise;
+    setProof(
+      {
+        ...proof,
+        premises: [...proof.premises, p],
+      },
+      true
+    );
+  };
+
+  const addGoal = () => {
+    const g = {
+      type: "goal",
+      raw: "",
+      result: parseFormulaInput(""),
+      rule: "none",
+      number: 0,
+    } as Goal;
+    setProof(
+      {
+        ...proof,
+        goals: [...proof.goals, g],
+      },
+      true
+    );
+  };
+
+  const deletePremise = (index: number) => {
+    const newPremises = [...proof.premises];
+    newPremises.splice(index, 1);
+    setProof({ ...proof, premises: newPremises }, true);
+  };
+
+  const deleteGoal = (index: number) => {
+    const newGoals = [...proof.goals];
+    newGoals.splice(index, 1);
+    setProof({ ...proof, goals: newGoals }, true);
+  };
+
+  const updateStepAt = (
+    index: number,
+    updated: Step,
+    changeNumber?: boolean
+  ) => {
     const newSteps = [...proof.steps];
     newSteps[index] = updated;
-    setProof({ ...proof, steps: newSteps });
+    setProof({ ...proof, steps: newSteps }, changeNumber);
   };
 
   const addStep = () => {
-    setProof({
-      ...proof,
-      steps: [
-        ...proof.steps,
-        {
-          type: "line",
-          raw: "",
-          result: parseFormulaInput(""),
-          rule: "∧Elim",
-          parents: [],
-          number: proof.steps.length + 1,
-        },
-      ],
-    });
-  };
-
-  const addSubproof = () => {
-    setProof({
-      ...proof,
-      steps: [
-        ...proof.steps,
-        {
-          type: "subproof",
-          premise: {
+    setProof(
+      {
+        ...proof,
+        steps: [
+          ...proof.steps,
+          {
             type: "line",
             raw: "",
             result: parseFormulaInput(""),
-            rule: "none",
+            rule: "∧Elim",
             parents: [],
-            number: proof.steps.length + 1,
+            parentsRaw: "",
+            number: 0,
           },
-          steps: [],
-          constants: [],
-          number: proof.steps.length + 1,
-        },
-      ],
-    });
+        ],
+      },
+      true
+    );
+  };
+
+  const addSubproof = () => {
+    setProof(
+      {
+        ...proof,
+        steps: [
+          ...proof.steps,
+          {
+            type: "subproof",
+            premise: {
+              type: "line",
+              raw: "",
+              result: parseFormulaInput(""),
+              rule: "none",
+              parents: [],
+              parentsRaw: "",
+              number: 0,
+            },
+            steps: [],
+            raw: "",
+            constants: [],
+            constantsRaw: "",
+            number: 0,
+          },
+        ],
+      },
+      true
+    );
+  };
+
+  const deleteStep = (index: number) => {
+    const newSteps = [...proof.steps];
+    newSteps.splice(index, 1);
+    setProof({ ...proof, steps: newSteps }, true);
   };
 
   const deleteStep = (index: number) => {
@@ -133,10 +194,16 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
 
               <input
                 value={p.raw}
-                onChange={(e) => updatePremise(i, e.target.value)}
+                onChange={(e) => updatePremiseRaw(i, e.target.value)}
                 className="border px-2 py-1 rounded w-full"
                 placeholder={`Premise ${i + 1}`}
               />
+              <button
+                onClick={() => deletePremise(i)}
+                className="ml-2 border px-2 py-1 rounded bg-base hover-bg-dark-base text-white"
+              >
+                Delete
+              </button>
             </div>
           ))}
           <button onClick={addPremise} className="mt-2 text-sm text-blue-600">
@@ -152,7 +219,10 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
             <StepEditor
               key={i}
               step={step}
-              updateStep={(updated) => updateStepAt(i, updated)}
+              updateStep={(updated, changeNumber) =>
+                updateStepAt(i, updated, changeNumber)
+              }
+              deleteStep={() => deleteStep(i)}
               deleteStep={() => deleteStep(i)}
             />
           ))}
@@ -169,11 +239,32 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
           </div>
         </div>
       </div>
+      <div>
+        <h3 className="font-semibold mb-2">Goals</h3>
+        <div className="flex flex-col gap-2">
+          {proof.goals.map((g, i) => (
+            <div className="flex flex-row w-full h-full" key={g.number}>
+              <div className="h-full p-1 text-lg">{g.number}</div>
 
-      <p>
-        TODO: Add the goals & conclusion at the bottom. I put it in the proof
-        type. See the other TODO that shows up when you click Add subproof.
-      </p>
+              <input
+                value={g.raw}
+                onChange={(e) => updateGoalRaw(i, e.target.value)}
+                className="border px-2 py-1 rounded w-full"
+                placeholder={`Goal ${i + 1}`}
+              />
+              <button
+                onClick={() => deleteGoal(i)}
+                className="ml-2 border px-2 py-1 rounded bg-base hover-bg-dark-base text-white"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+          <button onClick={addGoal} className="mt-2 text-sm text-blue-600">
+            + Add Goal
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -5,10 +5,11 @@ import { useState } from "react";
 import StepEditor from "./StepEditor";
 import StatementEditor from "./StatementEditor";
 import { text } from "stream/consumers";
+import { Constant } from "@/lib/logic/logic";
 
 type SubproofEditorProps = {
   subproof: Subproof;
-  onChange: (updated: Subproof) => void;
+  onChange: (updated: Subproof, changeNumber?: boolean) => void;
   deleteSubproof: () => void;
 };
 
@@ -16,52 +17,61 @@ export default function SubproofEditor({
   subproof,
   onChange,
   deleteSubproof,
-  
 }: SubproofEditorProps) {
-  const updateStepAt = (index: number, updated: Step) => {
+  const updateStepAt = (index: number, updated: Step, changeNumber?: boolean) => {
     const newSteps = [...subproof.steps];
     newSteps[index] = updated;
-    onChange({ ...subproof, steps: newSteps });
+    onChange({ ...subproof, steps: newSteps }, changeNumber);
   };
 
   const addStep = () => {
-    onChange({
-      ...subproof,
-      steps: [
-        ...subproof.steps,
-        {
-          type: "line",
-          raw: "",
-          result: parseFormulaInput(""),
-          rule: "∧Elim",
-          parents: [],
-          number: subproof.steps.length + 1,
-        },
-      ],
-    });
-  };
-
-  const addSubproof = () => {
-    onChange({
-      ...subproof,
-      steps: [
-        ...subproof.steps,
-        {
-          type: "subproof",
-          premise: {
+    onChange(
+      {
+        ...subproof,
+        steps: [
+          ...subproof.steps,
+          {
             type: "line",
             raw: "",
             result: parseFormulaInput(""),
-            rule: "none",
+            rule: "∧Elim",
             parents: [],
+            parentsRaw: "",
             number: subproof.steps.length + 1,
           },
-          steps: [],
-          constants: [],
-          number: subproof.steps.length + 1,
-        },
-      ],
-    });
+        ],
+      },
+      true
+    );
+  };
+
+  const addSubproof = () => {
+    onChange(
+      {
+        ...subproof,
+        steps: [
+          ...subproof.steps,
+          {
+            type: "subproof",
+            premise: {
+              type: "line",
+              raw: "",
+              result: parseFormulaInput(""),
+              rule: "none",
+              parents: [],
+              parentsRaw: "",
+              number: subproof.steps.length + 1,
+            },
+            steps: [],
+            constants: [],
+            constantsRaw: "",
+            raw: "",
+            number: subproof.steps.length + 1,
+          },
+        ],
+      },
+      true
+    );
   };
 
   const onChangePremise = (text: string) => {
@@ -73,21 +83,46 @@ export default function SubproofEditor({
     onChange({ ...subproof, premise: updatedPremise });
   };
 
+  const changeConstants = (text: string) => {
+    const constants = text
+      .split(",")
+      .map((v) => v.trim())
+      .filter((v) => v !== "");
+    const updatedSubproof = {
+      ...subproof,
+      constants: constants.map(
+        (v, i) =>
+          ({
+            type: "constant",
+            name: v,
+          } as Constant)
+      ),
+      constantsRaw: text,
+    };
+    onChange(updatedSubproof, true);
+  };
   const deleteStep = (index: number) => {
     const newSteps = [...subproof.steps];
     newSteps.splice(index, 1);
-    onChange({ ...subproof, steps: newSteps });
+    onChange({ ...subproof, steps: newSteps }, true);
   };
   return (
     <div className="flex flex-col gap-2 pl-4 sub relative">
-      <div className="flex flex-row w-full h-full mb-2">
+      <div className="flex flex-row w-full h-full mb-2 gap-2 align-middle">
         <div className="h-full p-1 text-lg">{subproof.number}</div>
         <input
           type="text"
           value={subproof.premise.raw}
           onChange={(e) => onChangePremise(e.target.value)}
-          className="px-2 py-1 rounded w-full sub-premise"
+          className="px-2 py-1 rounded flex-grow-3"
           placeholder="Subproof Premise"
+        />
+        <input
+          type="text"
+          value={subproof.constantsRaw}
+          onChange={(e) => changeConstants(e.target.value)}
+          className="px-2 py-1 rounded flex-grow-1"
+          placeholder="Constants (a,b,c)"
         />
         <button
           className="ml-2 border px-2 py-1 rounded bg-base hover-bg-dark-base text-white"
@@ -100,7 +135,7 @@ export default function SubproofEditor({
         <StepEditor
           key={"step-" + i}
           step={step}
-          updateStep={(updated) => updateStepAt(i, updated)}
+          updateStep={(updated, changeNumber) => updateStepAt(i, updated, changeNumber)}
           deleteStep={() => deleteStep(i)}
         />
       ))}
