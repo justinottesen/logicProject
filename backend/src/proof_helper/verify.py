@@ -4,11 +4,6 @@ from proof_helper.proof import Statement, Subproof, Step
 from proof_helper.rules import RuleChecker
 
 def verify_statement(statement: Statement, proof: Proof, checker: RuleChecker) -> bool:
-    print(f"Verifying statement {statement.id}: {statement.rule}")
-    print(f"  Premises: {[str(p) for p in statement.premises]}")
-    print(f"  Found steps: {[proof.get_step(p) for p in statement.premises]}")
-    print(f"  Formula: {statement.formula}")
-
     if statement.rule is None or not checker.has(statement.rule):
         return False
 
@@ -20,7 +15,6 @@ def verify_statement(statement: Statement, proof: Proof, checker: RuleChecker) -
         supports.append(step)
 
     rule_fn = checker.get(statement.rule)
-    print(f"  Rule result: {rule_fn(supports, statement)}")
     return rule_fn(supports, statement)
 
 def verify_subproof(subproof: Subproof, proof: Proof, checker: RuleChecker) -> bool:
