@@ -6,13 +6,11 @@ type StatementEditorProps = {
   statement: Statement;
   onChange: (updated: Statement) => void;
   deleteStatement: () => void;
-  deleteStatement: () => void;
 };
 
 export default function StatementEditor({
   statement,
   onChange,
-  deleteStatement,
   deleteStatement,
 }: StatementEditorProps) {
   const handleChange = (raw: string) => {

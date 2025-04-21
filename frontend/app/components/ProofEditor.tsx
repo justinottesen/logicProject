@@ -149,11 +149,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
     setProof({ ...proof, steps: newSteps }, true);
   };
 
-  const deleteStep = (index: number) => {
-    const newSteps = [...proof.steps];
-    newSteps.splice(index, 1);
-    setProof({ ...proof, steps: newSteps });
-  };
+
 
   // add the substutions to the proof
   useEffect(() => {
@@ -222,7 +218,6 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
               updateStep={(updated, changeNumber) =>
                 updateStepAt(i, updated, changeNumber)
               }
-              deleteStep={() => deleteStep(i)}
               deleteStep={() => deleteStep(i)}
             />
           ))}
