@@ -1,7 +1,7 @@
 from typing import List, Union, NamedTuple
 from proof_helper.core.proof import Proof, StepID
 from proof_helper.core.proof import Statement, Subproof, Step
-from proof_helper.logic.rules_builtin import RuleRegistry
+from proof_helper.logic.rule_registry import RuleRegistry
 
 class VerificationError(NamedTuple):
     step_id: str

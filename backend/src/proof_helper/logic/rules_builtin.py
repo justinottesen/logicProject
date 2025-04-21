@@ -7,47 +7,6 @@ from proof_helper.logic.rules_custom import CustomRule
 # Each rule takes premises + subproofs and returns a derived formula
 RuleFn = Callable[[List[Step], Statement], bool]
 
-class RuleRegistry:
-    def __init__(self):
-        self.rules: Dict[str, RuleFn] = {
-            # Assumption - For premises & subproof assumptions
-            "Assumption": rule_wrapper(assumption_rule),
-            # Reiteration
-            "Reiteration": rule_wrapper(reiteration_rule),
-            # Introduction Rules
-            "∧ Introduction": rule_wrapper(and_introduction_rule),
-            "∨ Introduction": rule_wrapper(or_introduction_rule),
-            "¬ Introduction": rule_wrapper(not_introduction_rule),
-            "⊥ Introduction": rule_wrapper(bottom_introduction_rule),
-            "→ Introduction": rule_wrapper(conditional_introduction_rule),
-            "↔ Introduction": rule_wrapper(biconditional_introduction_rule),
-            # Elimination Rules
-            "∧ Elimination": rule_wrapper(and_elimination_rule),
-            "∨ Elimination": rule_wrapper(or_elimination_rule),
-            "¬ Elimination": rule_wrapper(not_elimination_rule),
-            "⊥ Elimination": rule_wrapper(bottom_elimination_rule),
-            "→ Elimination": rule_wrapper(conditional_elimination_rule),
-            "↔ Elimination": rule_wrapper(biconditional_elimination_rule),
-        }
-        self.custom_rules: Dict[str, CustomRule] = {}
-
-    def add_custom_rule(self, name: str, proof: Proof):
-        if name in self.rules or name in self.custom_rules:
-            raise ValueError(f"Rule '{name}' already exists")
-
-        rule = CustomRule(name, proof)
-        self.custom_rules[name] = rule
-
-    def get(self, name: str) -> RuleFn:
-        if name in self.rules:
-            return self.rules[name]
-        if name in self.custom_rules:
-            return self.custom_rules[name]
-        raise KeyError(f"Rule '{name}' not found")
-
-    def has(self, name: str) -> bool:
-        return name in self.rules or name in self.custom_rules
-
     
 def rule_wrapper(fn: RuleFn) -> RuleFn:
     @wraps(fn)

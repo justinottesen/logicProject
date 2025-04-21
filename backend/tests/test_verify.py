@@ -1,7 +1,7 @@
 import pytest
 from proof_helper.core.formula import Variable, And, Or, Bottom, Not
 from proof_helper.core.proof import Proof, StepID, Statement, Subproof, Step
-from proof_helper.logic.rules_builtin import RuleRegistry
+from proof_helper.logic.rule_registry import RuleRegistry
 from proof_helper.logic.verify import VerificationError, verify_statement, verify_subproof, verify_step, verify_proof
 
 # === Helpers ===
