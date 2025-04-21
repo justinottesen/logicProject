@@ -4,7 +4,7 @@ import SubproofEditor from "./SubproofEditor";
 
 type StepEditorProps = {
   step: Step;
-  updateStep: (updated: Step) => void;
+  updateStep: (updated: Step, changeNumber?: boolean) => void;
   deleteStep: () => void;
 };
 

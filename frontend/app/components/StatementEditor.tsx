@@ -21,13 +21,20 @@ export default function StatementEditor({
   };
 
   return (
-    <div className="flex flex-row w-full h-full">
+    <div className="flex flex-row w-full h-full align-middle gap-2">
       <div className="h-full p-1 text-lg">{statement.number}</div>
       <input
         value={statement.raw}
         onChange={(e) => handleChange(e.target.value)}
-        className="border px-2 py-1 rounded w-full"
+        className="border px-2 py-1 rounded flex-grow-3"
         placeholder="Statement"
+      />
+      <input
+        type="text"
+        value={statement.parentsRaw}
+        onChange={(e) => onChange({ ...statement, parentsRaw: e.target.value })}
+        className="border px-2 py-1 rounded flex-grow-1"
+        placeholder="Parents (1,2,3)"
       />
       <select
         value={statement.rule}
