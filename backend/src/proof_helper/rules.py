@@ -18,6 +18,13 @@ class RuleChecker:
             "⊥ Introduction": rule_wrapper(bottom_introduction_rule),
             "→ Introduction": rule_wrapper(conditional_introduction_rule),
             "↔ Introduction": rule_wrapper(biconditional_introduction_rule),
+            # Elimination Rules
+            "∧ Elimination": rule_wrapper(and_elimination_rule),
+            "∨ Elimination": rule_wrapper(or_elimination_rule),
+            "¬ Elimination": rule_wrapper(not_elimination_rule),
+            "⊥ Elimination": rule_wrapper(bottom_elimination_rule),
+            "→ Elimination": rule_wrapper(conditional_elimination_rule),
+            "↔ Elimination": rule_wrapper(biconditional_elimination_rule),
         }
 
     def get(self, name: str) -> RuleFn:
@@ -188,3 +195,151 @@ def biconditional_introduction_rule(supports: List[Step], statement: Statement) 
     expected2 = Iff(b_conclude, b_assume)
 
     return statement.formula == expected1 or statement.formula == expected2
+
+def and_elimination_rule(supports: List[Step], statement: Statement) -> bool:
+    # Requires 1 supporting step
+    if len(supports) != 1:
+        return False
+    support = supports[0]
+
+    # Supporting step must be a statement
+    if not isinstance(support, Statement):
+        return False
+
+    # Supporting step must be an And op
+    if not isinstance(support.formula, And):
+        return False
+
+    def collect_conjuncts(formula: Formula) -> Set[Formula]:
+        if isinstance(formula, And):
+            return collect_conjuncts(formula.left) | collect_conjuncts(formula.right)
+        else:
+            return { formula }
+    
+    # Statement must be a subset of conjunctions of the supporting statement
+    support_conjuncts = collect_conjuncts(support.formula)
+    statement_conjuncts = collect_conjuncts(statement.formula)
+
+    return statement_conjuncts <= support_conjuncts
+
+def or_elimination_rule(supports: List[Step], statement: Statement) -> bool:
+    if len(supports) < 2:
+        return False
+
+    disj_step = supports[0]
+    subproofs = supports[1:]
+
+    # Check disjunction is a statement
+    if not isinstance(disj_step, Statement):
+        return False
+    
+
+    def collect_disjuncts(formula: Formula) -> List[Formula]:
+        if isinstance(formula, Or):
+            return collect_disjuncts(formula.left) + collect_disjuncts(formula.right)
+        return [formula]
+    disjuncts = collect_disjuncts(disj_step.formula)
+
+    # Must be one subproof per disjunct
+    if len(disjuncts) != len(subproofs):
+        return False
+
+    # Must match disjuncts in any order
+    matched = set()
+    result_formula = None
+
+    for sp in subproofs:
+        if not isinstance(sp, Subproof):
+            return False
+        if not sp.steps or not isinstance(sp.steps[-1], Statement):
+            return False
+
+        assumption = sp.assumption.formula
+        conclusion = sp.steps[-1].formula
+
+        if result_formula is None:
+            result_formula = conclusion
+        elif result_formula != conclusion:
+            return False
+
+        if assumption not in disjuncts:
+            return False
+        if assumption in matched:
+            return False  # no double-handling
+        matched.add(assumption)
+
+    return result_formula == statement.formula and len(matched) == len(disjuncts)
+
+def not_elimination_rule(supports: List[Step], statement: Statement) -> bool:
+    # Requires 1 supporting step
+    if len(supports) != 1:
+        return False
+    support = supports[0]
+
+    # Support must be a statement
+    if not isinstance(support, Statement):
+        return False
+    
+    # Support must be a double negation
+    if not isinstance(support.formula, Not):
+        return False
+    if not isinstance(support.formula.value, Not):
+        return False
+    
+    # Conclusion must match the unwrapped support
+    return support.formula.value.value == statement.formula
+
+def bottom_elimination_rule(supports: List[Step], statement: Statement) -> bool:
+    # Requires 1 supporting step
+    if len(supports) != 1:
+        return False
+    support = supports[0]
+
+    # Support must be a statement
+    if not isinstance(support, Statement):
+        return False
+    
+    # Support must be a bottom
+    if not isinstance(support.formula, Bottom):
+        return False
+    
+    # Statement can be whatever
+    return True
+
+def conditional_elimination_rule(supports: List[Step], statement: Statement) -> bool:
+    if len(supports) != 2:
+        return False
+
+    a, b = supports
+    if not isinstance(a, Statement) or not isinstance(b, Statement):
+        return False
+
+    # Check both orders
+    if isinstance(a.formula, Implies) and a.formula.left == b.formula:
+        return statement.formula == a.formula.right
+    if isinstance(b.formula, Implies) and b.formula.left == a.formula:
+        return statement.formula == b.formula.right
+
+    return False
+
+def biconditional_elimination_rule(supports: List[Step], statement: Statement) -> bool:
+    if len(supports) != 2:
+        return False
+
+    a, b = supports
+    if not isinstance(a, Statement) or not isinstance(b, Statement):
+        return False
+
+    if isinstance(a.formula, Iff):
+        if a.formula.left == b.formula:
+            return statement.formula == a.formula.right
+        if a.formula.right == b.formula:
+            return statement.formula == a.formula.left
+
+    if isinstance(b.formula, Iff):
+        if b.formula.left == a.formula:
+            return statement.formula == b.formula.right
+        if b.formula.right == a.formula:
+            return statement.formula == b.formula.left
+
+    return False
