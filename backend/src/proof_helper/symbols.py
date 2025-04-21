@@ -5,12 +5,7 @@ def substitute_symbols(text: str) -> str:
         '|': '∨',
         '$': '→',
         '%': '↔',
-        '@': '∀',
-        '/': '∃',
-        '#': '≠',
-        '_': '⊆',
         '^': '⊥',
-        '\\': '∈',
     }
 
     # Don't modify comments
