@@ -42,15 +42,3 @@ export type IdentityIntro = {
     name: '⊥Intro';
     symbol: '⊥';
 }
-
-export type UniversalIntro = {
-    name: '∀Intro';
-    parents: Subproof;
-    symbol: '∀';
-}
-
-export type ExistentialIntro = {
-    name: '∃Intro';
-    parents: Statement;
-    symbol: '∃';
-}

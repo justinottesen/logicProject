@@ -47,16 +47,3 @@ export type IdentityElim = {
     parents: Statement;
     symbol: '⊥';
 }
-
-export type UniversalElim = {
-    name: '∀Elim';
-    parents: Statement;
-    symbol: '∀';
-}
-
-export type ExistentialElim = {
-    name: '∃Elim';
-    parents: [Statement, Subproof];
-    symbol: '∃';
-}
-
