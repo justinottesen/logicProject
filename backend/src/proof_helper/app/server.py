@@ -14,8 +14,6 @@ class ProofApp(Flask):
         self.custom_rule_store = CustomRuleStore(rules_dir) if rules_dir else None
         self.rule_registry = RuleRegistry(custom_rule_store=self.custom_rule_store)
 
-app = ProofApp(__name__)
-
 def register_routes(app: ProofApp):
     @app.route('/verify_proof', methods=['POST'])
     def verify_proof_api():
@@ -64,7 +62,7 @@ def register_routes(app: ProofApp):
 
             # Add rule to registry
             app.rule_registry.add_custom_rule(name, proof)
-            
+
             return "", 200
 
         except Exception as e:
