@@ -54,7 +54,7 @@ def rule_wrapper(fn: RuleFn) -> RuleFn:
 
 def assumption_rule(supports: List[Step], statement: Statement) -> bool:
     # Assumption does not require any supporting steps (premises & subproofs)
-    return not supports and statement
+    return bool(not supports and statement)
 
 def and_introduction_rule(supports: List[Step], statement: Statement) -> bool:
     def collect_conjuncts(formula: Formula) -> Set[Formula]:

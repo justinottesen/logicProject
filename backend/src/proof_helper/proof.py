@@ -38,18 +38,11 @@ class Step(ABC):
     def get_step(self, id: StepID) -> Optional[Step]:
         pass
 
-    @abstractmethod
-    def verify(step, proof: Proof) -> bool:
-        pass
-
 @dataclass(frozen=True)
 class Statement(Step):
     formula: Formula
     rule: Optional[str] = None
     premises: List[StepID] = ()
-
-    def verify(self, proof: Proof) -> bool:
-        return True
     
     def get_step(self, step: StepID) -> Optional[Step]:
         return self if self.id.equals(step) else None
@@ -58,12 +51,6 @@ class Statement(Step):
 class Subproof(Step):
     assumption: Statement
     steps: List[Step]
-
-    def verify(self, proof: Proof) -> bool:
-        for step in self.steps:
-            if not step.verify(proof):
-                return False
-        return True
     
     def get_step(self, step: StepID) -> Optional[Step]:
         for x in [self.assumption] + self.steps:
@@ -76,15 +63,6 @@ class Proof:
     premises: List[Statement]
     steps: List[Step]
     conclusions: List[Statement]
-
-    def verify(self) -> bool:
-        for step in self.steps:
-            if not step.verify():
-                return False
-        for conclusion in self.conclusions:
-            if not conclusion.verify():
-                return False
-        return True
     
     def get_step(self, step: StepID) -> Optional[Step]:
         for x in self.premises + self.steps + self.conclusions:
