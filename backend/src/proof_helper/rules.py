@@ -11,6 +11,8 @@ class RuleChecker:
         self.rules: Dict[str, RuleFn] = {
             # Assumption - For premises & subproof assumptions
             "Assumption": rule_wrapper(assumption_rule),
+            # Reiteration
+            "Reiteration": rule_wrapper(reiteration_rule),
             # Introduction Rules
             "∧ Introduction": rule_wrapper(and_introduction_rule),
             "∨ Introduction": rule_wrapper(or_introduction_rule),
@@ -55,6 +57,19 @@ def rule_wrapper(fn: RuleFn) -> RuleFn:
 def assumption_rule(supports: List[Step], statement: Statement) -> bool:
     # Assumption does not require any supporting steps (premises & subproofs)
     return bool(not supports and statement)
+
+def reiteration_rule(supports: List[Step], statement: Statement) -> bool:
+    # Must have one supporting step
+    if len(supports) != 1:
+        return False
+    support = supports[0]
+
+    # Support must be a statement
+    if not isinstance(support, Statement):
+        return False
+
+    # Formulas must match
+    return support.formula == statement.formula
 
 def and_introduction_rule(supports: List[Step], statement: Statement) -> bool:
     def collect_conjuncts(formula: Formula) -> Set[Formula]:

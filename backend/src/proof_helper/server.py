@@ -1,28 +1,27 @@
 from flask import Flask, request, jsonify
+from proof_helper.rules import RuleChecker
+from proof_helper.proof import Proof
+from proof_helper.deserialize import build_proof
+from proof_helper.verify import verify_proof
 import argparse
+import traceback
 
-app = Flask(__name__)
+class ProofApp(Flask):
+    def __init__(self, import_name: str):
+        super().__init__(import_name)
+        self.rule_checker = RuleChecker()
 
-@app.route('/api/verify/syntax', methods=['POST'])
-def verify_syntax():
-    data = request.get_json()
-    statement = data.get('statement')
-    # TODO: Call internal function to check syntax
-    return jsonify({"valid": True, "message": "Syntax is valid."})
+app = ProofApp(__name__)
 
-@app.route('/api/verify/step', methods=['POST'])
-def verify_step():
-    data = request.get_json()
-    step = data.get('step')
-    # TODO: Call internal function to check rule and cited steps
-    return jsonify({"valid": True, "message": "Step is valid."})
-
-@app.route('/api/verify/proof', methods=['POST'])
-def verify_proof():
-    data = request.get_json()
-    proof = data.get('proof')
-    # TODO: Call internal function to check entire proof
-    return jsonify({"valid": True, "message": "Proof is valid."})
+@app.route('/verify/proof', methods=['POST'])
+def verify_proof_api():
+    try:
+        data = request.get_json()
+        proof: Proof = build_proof(data)
+        result = verify_proof(proof, app.rule_checker)
+        return jsonify({"valid": result})
+    except Exception as e:
+        return jsonify({"valid": False, "error": str(e), "trace": traceback.format_exc()}), 400
 
 def main():
     parser = argparse.ArgumentParser(description="Proof Helper Flask Server")

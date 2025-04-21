@@ -1,15 +1,15 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Tuple, Optional
 from proof_helper.formula import Formula
 from abc import ABC, abstractmethod
 
 @dataclass(frozen=True)
 class StepID:
-    path: List[int]
+    path: Tuple[int, ...]
 
     def __str__(self):
-        return ".".join(tuple(str(x) for x in self.path))
+        return ".".join(str(x) for x in self.path)
     
     @classmethod
     def from_string(cls, s: str) -> StepID:
@@ -25,7 +25,9 @@ class StepID:
         for x, y in zip(self.path, other.path):
             if x < y:
                 return True
-        return False
+            if x > y:
+                return False
+        return len(self.path) < len(other.path)
     
     def is_given_for(self, other: StepID) -> bool:
         return self.is_before(other) and len(self.path) <= len(other.path)
