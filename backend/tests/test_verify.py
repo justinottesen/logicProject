@@ -2,7 +2,7 @@ import pytest
 from proof_helper.formula import Variable, And, Or, Bottom, Not
 from proof_helper.proof import Proof, StepID, Statement, Subproof, Step
 from proof_helper.rules import RuleChecker
-from proof_helper.verify import verify_statement, verify_subproof, verify_step, verify_proof
+from proof_helper.verify import VerificationError, verify_statement, verify_subproof, verify_step, verify_proof
 
 # === Helpers ===
 
@@ -36,14 +36,16 @@ def test_invalid_rule_returns_false():
     s = stmt("1", P, rule="Gibberish")
     proof = fake_proof(steps=[s])
     checker = RuleChecker()
-    assert not verify_statement(s, proof, checker)
+    result = verify_statement(s, proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_none_rule_returns_false():
     P = Variable("P")
     s = stmt("1", P, rule=None)
     proof = fake_proof(steps=[s])
     checker = RuleChecker()
-    assert not verify_statement(s, proof, checker)
+    result = verify_statement(s, proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_valid_and_intro():
     P = Variable("P")
@@ -63,7 +65,8 @@ def test_invalid_and_intro_wrong_formula():
     wrong = stmt("3", Variable("X"), rule="∧ Introduction", premises=[sid("1"), sid("2")])
     proof = fake_proof(premises=[a, b], steps=[wrong])
     checker = RuleChecker()
-    assert not verify_statement(wrong, proof, checker)
+    result = verify_statement(wrong, proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_invalid_missing_premise():
     P = Variable("P")
@@ -71,7 +74,8 @@ def test_invalid_missing_premise():
     b = stmt("2", P, rule="∨ Introduction", premises=[sid("1"), sid("999")])  # 999 doesn't exist
     proof = fake_proof(premises=[a], steps=[b])
     checker = RuleChecker()
-    assert not verify_statement(b, proof, checker)
+    result = verify_statement(b, proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_valid_bottom_elimination():
     bottom = stmt("1", Bottom(), rule="Assumption")
@@ -90,7 +94,8 @@ def test_invalid_subproof_with_invalid_assumption():
     sp = subproof("1", assume, [step])
     proof = fake_proof()
     checker = RuleChecker()
-    assert not verify_subproof(sp, proof, checker)
+    result = verify_subproof(sp, proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_invalid_subproof_with_invalid_inner_step():
     P = Variable("P")
@@ -100,7 +105,8 @@ def test_invalid_subproof_with_invalid_inner_step():
     sp = subproof("1", assume, [step])
     proof = fake_proof()
     checker = RuleChecker()
-    assert not verify_subproof(sp, proof, checker)
+    result = verify_subproof(sp, proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_empty_subproof_is_valid_if_assumption_is_valid():
     A = Variable("A")
@@ -149,7 +155,8 @@ def test_invalid_proof_with_missing_premise():
 
     checker = RuleChecker()
 
-    assert not verify_proof(proof, checker)
+    result = verify_proof(proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_invalid_proof_with_wrong_conclusion():
     P = Variable("P")
@@ -165,14 +172,16 @@ def test_invalid_proof_with_wrong_conclusion():
 
     checker = RuleChecker()
 
-    assert not verify_proof(proof, checker)
+    result = verify_proof(proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_invalid_premise_rule():
     P = Variable("P")
     bad_premise = stmt("1", P, rule="∨ Introduction")  # not Assumption
     proof = Proof(premises=[bad_premise], steps=[], conclusions=[])
     checker = RuleChecker()
-    assert not verify_proof(proof, checker)
+    result = verify_proof(proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_invalid_conclusion_rule():
     P = Variable("P")
@@ -181,7 +190,8 @@ def test_invalid_conclusion_rule():
     bad_conclusion = stmt("3", P, rule="∧ Introduction", premises=[sid("1"), sid("1")])
     proof = Proof(premises=[good], steps=[derived], conclusions=[bad_conclusion])
     checker = RuleChecker()
-    assert not verify_proof(proof, checker)
+    result = verify_proof(proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_invalid_subproof_assumption_rule():
     P = Variable("P")
@@ -191,7 +201,8 @@ def test_invalid_subproof_assumption_rule():
     reiterate = stmt("2", Bottom(), rule="Reiteration", premises=[sid("1.2")])
     proof = Proof(premises=[], steps=[assume, step, sp, reiterate], conclusions=[reiterate])
     checker = RuleChecker()
-    assert not verify_proof(proof, checker)
+    result = verify_proof(proof, checker)
+    assert isinstance(result, VerificationError)
 
 def test_valid_conjunction_with_reiteration():
     P = Variable("P")

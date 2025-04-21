@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from proof_helper.rules import RuleChecker
 from proof_helper.proof import Proof
 from proof_helper.deserialize import build_proof
-from proof_helper.verify import verify_proof
+from proof_helper.verify import verify_proof, VerificationError
 import argparse
 import traceback
 
@@ -17,11 +17,26 @@ app = ProofApp(__name__)
 def verify_proof_api():
     try:
         data = request.get_json()
-        proof: Proof = build_proof(data)
-        result = verify_proof(proof, app.rule_checker)
-        return jsonify({"valid": result})
+        proof = build_proof(data)
+        checker = app.rule_checker
+
+        result = verify_proof(proof, checker)
+
+        if result is True:
+            return "", 200
+        else:
+            assert isinstance(result, VerificationError)
+            return jsonify({
+                "step_id": result.step_id,
+                "message": result.message
+            }), 400
+
     except Exception as e:
-        return jsonify({"valid": False, "error": str(e), "trace": traceback.format_exc()}), 400
+        return jsonify({
+            "step_id": None,
+            "message": str(e),
+            "trace": traceback.format_exc()
+        }), 400
 
 def main():
     parser = argparse.ArgumentParser(description="Proof Helper Flask Server")

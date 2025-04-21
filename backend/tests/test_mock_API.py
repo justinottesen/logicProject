@@ -7,7 +7,7 @@ def client():
     with app.test_client() as client:
         yield client
 
-def test_verify_valid_conjunction_proof(client):
+def test_valid_proof_returns_200(client):
     payload = {
         "premises": [
             {
@@ -49,16 +49,15 @@ def test_verify_valid_conjunction_proof(client):
 
     response = client.post("/verify/proof", json=payload)
     assert response.status_code == 200
-    data = response.get_json()
-    assert data["valid"] is True
-
-def test_verify_invalid_proof_wrong_rule(client):
+    assert response.data == b""
+    
+def test_missing_rule_returns_400(client):
     payload = {
         "premises": [
             {
                 "id": "1",
-                "formula": { "type": "var", "name": "P" },
-                "rule": "Gibberish"
+                "formula": { "type": "var", "name": "P" }
+                # missing rule
             }
         ],
         "steps": [],
@@ -66,10 +65,40 @@ def test_verify_invalid_proof_wrong_rule(client):
     }
 
     response = client.post("/verify/proof", json=payload)
-    assert response.status_code == 400 or not response.get_json()["valid"]
-
-def test_verify_malformed_json(client):
-    response = client.post("/verify/proof", data="not json at all")
     assert response.status_code == 400
-    assert "valid" in response.get_json()
-    assert response.get_json()["valid"] is False
+    data = response.get_json()
+    assert data["step_id"] == "1"
+    assert "Premise must use rule 'Assumption'" in data["message"]
+
+def test_conclusion_references_missing_step(client):
+    payload = {
+        "premises": [
+            {
+                "id": "1",
+                "formula": { "type": "var", "name": "P" },
+                "rule": "Assumption"
+            }
+        ],
+        "steps": [],
+        "conclusions": [
+            {
+                "id": "2",
+                "formula": { "type": "var", "name": "P" },
+                "rule": "Reiteration",
+                "premises": ["999"]
+            }
+        ]
+    }
+
+    response = client.post("/verify/proof", json=payload)
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data["step_id"] == "2"
+    assert "not found" in data["message"]
+
+def test_malformed_json_returns_400(client):
+    response = client.post("/verify/proof", data="not valid json")
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "step_id" in data
+    assert data["step_id"] is None
