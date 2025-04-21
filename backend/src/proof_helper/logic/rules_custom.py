@@ -1,4 +1,4 @@
-from proof_helper.proof import Proof, Step, Statement
+from proof_helper.core.proof import Proof, Step, Statement
 from typing import List
 
 class CustomRule:

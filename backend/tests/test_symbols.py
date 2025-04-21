@@ -1,4 +1,4 @@
-from proof_helper.symbols import substitute_symbols
+from proof_helper.core.symbols import substitute_symbols
 
 def test_basic_expansion():
     assert substitute_symbols("A$B") == "A→B"

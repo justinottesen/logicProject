@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
-from proof_helper.rules_builtin import RuleRegistry
-from proof_helper.proof import Proof
-from proof_helper.deserialize import build_proof
-from proof_helper.verify import verify_proof, VerificationError
+from proof_helper.logic.rules_builtin import RuleRegistry
+from proof_helper.core.proof import Proof
+from proof_helper.io.deserialize import build_proof
+from proof_helper.logic.verify import verify_proof, VerificationError
 import argparse
 import traceback
 

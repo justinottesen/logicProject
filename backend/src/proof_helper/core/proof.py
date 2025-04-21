@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
-from proof_helper.formula import Formula
+from proof_helper.core.formula import Formula
 from abc import ABC, abstractmethod
 
 @dataclass(frozen=True)

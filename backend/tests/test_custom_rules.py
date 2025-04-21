@@ -1,7 +1,7 @@
 import pytest
-from proof_helper.rules_custom import CustomRule
-from proof_helper.proof import Proof, StepID, Statement
-from proof_helper.formula import Variable, And
+from proof_helper.logic.rules_custom import CustomRule
+from proof_helper.core.proof import Proof, StepID, Statement
+from proof_helper.core.formula import Variable, And
 
 def sid(s: str) -> StepID:
     return StepID.from_string(s)

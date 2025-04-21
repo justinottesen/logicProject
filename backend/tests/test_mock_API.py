@@ -1,5 +1,5 @@
 import pytest
-from proof_helper.server import app
+from proof_helper.app.server import app
 
 @pytest.fixture
 def client():

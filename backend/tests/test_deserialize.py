@@ -1,7 +1,7 @@
 import pytest
-from proof_helper.deserialize import build_proof
-from proof_helper.formula import Variable, Bottom, Not, And
-from proof_helper.proof import StepID, Proof, Statement, Subproof
+from proof_helper.io.deserialize import build_proof
+from proof_helper.core.formula import Variable, Bottom, Not, And
+from proof_helper.core.proof import StepID, Proof, Statement, Subproof
 
 def test_parse_simple_statement():
     json_data = {

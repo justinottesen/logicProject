@@ -1,6 +1,6 @@
-from proof_helper.rules_builtin import rule_wrapper
-from proof_helper.formula import Variable
-from proof_helper.proof import Statement, StepID
+from proof_helper.logic.rules_builtin import rule_wrapper
+from proof_helper.core.formula import Variable
+from proof_helper.core.proof import Statement, StepID
 
 def dummy_rule(supports, statement):
     return True

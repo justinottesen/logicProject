@@ -1,4 +1,4 @@
-from proof_helper.rules_builtin import (
+from proof_helper.logic.rules_builtin import (
     assumption_rule,
     and_introduction_rule,
     or_introduction_rule,
@@ -7,8 +7,8 @@ from proof_helper.rules_builtin import (
     conditional_introduction_rule,
     biconditional_introduction_rule,
 )
-from proof_helper.formula import Variable, And, Or, Bottom, Not, Implies, Iff
-from proof_helper.proof import Statement, StepID, Subproof
+from proof_helper.core.formula import Variable, And, Or, Bottom, Not, Implies, Iff
+from proof_helper.core.proof import Statement, StepID, Subproof
 
 # Shortcuts
 def stmt(id: str, formula, rule=None, premises=None):

@@ -1,5 +1,5 @@
 import pytest
-from proof_helper.rules_builtin import (
+from proof_helper.logic.rules_builtin import (
     and_introduction_rule, and_elimination_rule,
     or_introduction_rule, or_elimination_rule,
     not_introduction_rule, not_elimination_rule,
@@ -7,8 +7,8 @@ from proof_helper.rules_builtin import (
     conditional_introduction_rule, conditional_elimination_rule,
     biconditional_introduction_rule, biconditional_elimination_rule
 )
-from proof_helper.formula import Variable, Not, And, Or, Implies, Iff, Bottom
-from proof_helper.proof import Statement, Subproof, StepID
+from proof_helper.core.formula import Variable, Not, And, Or, Implies, Iff, Bottom
+from proof_helper.core.proof import Statement, Subproof, StepID
 
 # === Helpers ===
 

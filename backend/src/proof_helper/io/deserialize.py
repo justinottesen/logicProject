@@ -1,5 +1,5 @@
-from proof_helper.formula import Variable, Not, And, Or, Implies, Iff, Bottom, Formula
-from proof_helper.proof import StepID, Proof, Statement, Subproof, Step
+from proof_helper.core.formula import Variable, Not, And, Or, Implies, Iff, Bottom, Formula
+from proof_helper.core.proof import StepID, Proof, Statement, Subproof, Step
 
 def parse_formula(data: dict) -> Formula:
     t = data["type"]

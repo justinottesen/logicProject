@@ -1,8 +1,8 @@
 from functools import wraps
 from typing import Callable, Dict, List, Set
-from proof_helper.proof import Step, Statement, Subproof, Proof
-from proof_helper.formula import Formula, And, Or, Not, Bottom, Implies, Iff
-from proof_helper.rules_custom import CustomRule
+from proof_helper.core.proof import Step, Statement, Subproof, Proof
+from proof_helper.core.formula import Formula, And, Or, Not, Bottom, Implies, Iff
+from proof_helper.logic.rules_custom import CustomRule
 
 # Each rule takes premises + subproofs and returns a derived formula
 RuleFn = Callable[[List[Step], Statement], bool]
