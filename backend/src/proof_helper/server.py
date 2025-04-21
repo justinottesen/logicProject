@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from proof_helper.rules import RuleChecker
+from proof_helper.rules_builtin import RuleRegistry
 from proof_helper.proof import Proof
 from proof_helper.deserialize import build_proof
 from proof_helper.verify import verify_proof, VerificationError
@@ -9,7 +9,7 @@ import traceback
 class ProofApp(Flask):
     def __init__(self, import_name: str):
         super().__init__(import_name)
-        self.rule_checker = RuleChecker()
+        self.rule_registry = RuleRegistry()
 
 app = ProofApp(__name__)
 
@@ -18,9 +18,9 @@ def verify_proof_api():
     try:
         data = request.get_json()
         proof = build_proof(data)
-        checker = app.rule_checker
+        rule_checker = app.rule_registry
 
-        result = verify_proof(proof, checker)
+        result = verify_proof(proof, rule_checker)
 
         if result is True:
             return "", 200

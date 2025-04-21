@@ -1,12 +1,13 @@
 from functools import wraps
 from typing import Callable, Dict, List, Set
-from proof_helper.proof import Step, Statement, Subproof
+from proof_helper.proof import Step, Statement, Subproof, Proof
 from proof_helper.formula import Formula, And, Or, Not, Bottom, Implies, Iff
+from proof_helper.rules_custom import CustomRule
 
 # Each rule takes premises + subproofs and returns a derived formula
 RuleFn = Callable[[List[Step], Statement], bool]
 
-class RuleChecker:
+class RuleRegistry:
     def __init__(self):
         self.rules: Dict[str, RuleFn] = {
             # Assumption - For premises & subproof assumptions
@@ -28,12 +29,25 @@ class RuleChecker:
             "→ Elimination": rule_wrapper(conditional_elimination_rule),
             "↔ Elimination": rule_wrapper(biconditional_elimination_rule),
         }
+        self.custom_rules: Dict[str, CustomRule] = {}
+
+    def add_custom_rule(self, name: str, proof: Proof):
+        if name in self.rules or name in self.custom_rules:
+            raise ValueError(f"Rule '{name}' already exists")
+
+        rule = CustomRule(name, proof)
+        self.custom_rules[name] = rule
 
     def get(self, name: str) -> RuleFn:
-        return self.rules[name]
+        if name in self.rules:
+            return self.rules[name]
+        if name in self.custom_rules:
+            return self.custom_rules[name]
+        raise KeyError(f"Rule '{name}' not found")
 
     def has(self, name: str) -> bool:
-        return name in self.rules
+        return name in self.rules or name in self.custom_rules
+
     
 def rule_wrapper(fn: RuleFn) -> RuleFn:
     @wraps(fn)

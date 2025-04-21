@@ -1,4 +1,4 @@
-from proof_helper.rules import (
+from proof_helper.rules_builtin import (
     assumption_rule,
     and_introduction_rule,
     or_introduction_rule,

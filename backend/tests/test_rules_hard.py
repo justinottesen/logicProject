@@ -1,5 +1,5 @@
 import pytest
-from proof_helper.rules import (
+from proof_helper.rules_builtin import (
     and_introduction_rule, and_elimination_rule,
     or_introduction_rule, or_elimination_rule,
     not_introduction_rule, not_elimination_rule,

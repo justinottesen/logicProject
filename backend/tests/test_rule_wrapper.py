@@ -1,4 +1,4 @@
-from proof_helper.rules import rule_wrapper
+from proof_helper.rules_builtin import rule_wrapper
 from proof_helper.formula import Variable
 from proof_helper.proof import Statement, StepID
 
