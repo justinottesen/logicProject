@@ -2,7 +2,7 @@
 name = "proof_helper"
 version = "0.1.0"
 description = "A command-line Fitch-style formal proof helper"
-requires-python = ">=3.12.3"
+requires-python = ">=3.9"
 dependencies = [
   "flask>=3.1.0"
 ]
@@ -17,5 +17,5 @@ dev = [
 ]
 
 [project.scripts]
-proof_cli = "proof_helper.cli:main"
-proof_server = "proof_helper.server:main"
+proof_cli = "proof_helper.app.cli:main"
+proof_server = "proof_helper.app.server:main"
