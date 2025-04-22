@@ -1,10 +1,12 @@
 # Formal Proof Helper
 
-This is the repository containing the final project for CSCI 4420 - Computability & Logic, submitted by Justin Ottesen and Murray Copps. This project is a web app which assists users with Fitch-style proofs. After the user enters the premises and conclusion, at each step of the proof they will be prompted with an algorithm's best guess as to what the next step of the proof should be.
+This is the repository containing the final project for CSCI 4420 - Computability & Logic, submitted by Justin Ottesen and Murray Copps. This project is a web app which assists users with Fitch-style proofs. The interface is very similar to the Fitch software used during the course, so we do not have specific usage instructions. Most of those instructions should apply.
 
 ## Features
 
 ### Roadmap
+
+The roadmap of goals for the project are below. Depending on time constraints, as well as difficulty of implementation, we may not reach all milestones, but at minimum, we hope to complete the first 3 steps. Steps 4 and 5 are reach goals, which would be nice to have. We also are only implementing propositional logic for simplicity.
 
 1. **Fitch Recreation** - The first step is to recreate a Fitch-style proof interface. This includes premises, conclusions, steps with justifications, introduction and elimination rules, and verifying correctness of steps and proofs.
 
@@ -16,116 +18,48 @@ This is the repository containing the final project for CSCI 4420 - Computabilit
 
 5. **Informed Search** - We can improve on our search algorithm by expanding possible choices according to some heuristic, possibly something as simple as our previous scoring heuristic, rather than just what we happen to expand first.
 
-### Project Status
+### Current Status
 
-| Feature              | Importance | Status       | Goal Date |
-|----------------------|------------|--------------|-----------|
-| Fitch Recreation     | Required   | In Progress  | 4/1/25    |
-| Patterns & Shortcuts | Required   | To Do        | 4/8/25    |
-| Step Scoring         | Required   | To Do        | 4/15/25   |
-| Look Ahead           | Bonus      | To Do        | 4/22/25   |
-| Informed Search      | Reach      | To Do        | 4/22/25   |
+Web-App Support: Step 1
 
-### Detailed Progress & Next Steps
-
-#### Fitch Recreation
-- [x] Users can enter premises, proof, and conclusion steps
-- [x] Users can create subproofs
-- [ ] Users can rearrange and delete steps / subproofs
-- [ ] Users can apply base rules to statements & cite supporting steps
-- [ ] App can validate user input and verify statement syntax
-- [ ] App can validate proper application of rules
-- [ ] App can validate all rules in succession to verify correctness of a proof
+CLI Support: Step 2
 
 ## Setup Instructions
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). The backend is a python module, managed by the `pyproject.toml` file.
 
-### Command Line Interface
+Requirements (Hopefully not missing anything):
+- `npm`: Package manager for npm front end
+- `python`: Language for the backend
 
-> These instructions assume you are on ubuntu which is what I use, @murraycopps maybe you can give windows instructions?
+### Run Web-App
 
-#### User Setup
+There are three scripts in the `scripts` directory, depending on your operating system and setup.
 
-TBD, if this is not filled out, you can just follow the developer setup instructions.
+**Linux**: Start the program by running `run.sh`
 
-#### Developer Setup
-
-Go to the `backend` directory and run the following:
-
-On the first time opening the repository, run:
-
-```sh
-./scripts/dev_setup.sh      # Run the setup script
-source .venv/bin/activate   # Activate the new virtual environment
+**Windows**: There are a few options to try, depending on your preferences:
+- There is a `run.bat` file, which can be run in a command prompt, or double clicked in a folder to run.
+- There is a `run.ps1` file which can be run in powershell. You may get an error / warning message, which should be able to be resolved by running the following:
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ```
 
-Each time you open the repository, you will need to activate the virtual environment.
+Once the system is running, go to http://localhost:3000/ and you should see the interface.
 
-To see the help menu for the command line interface, run in your terminal:
-
-```sh
-proof_cli -h
-```
-
-### Web-App Interface
-
-*Be sure to read both the front-end and back-end instructions*
+### Developer Setup
 
 #### Front End
 
-##### Getting Started
+Run one of the `dev_setup` scripts in `frontend/scripts`, depending on your flavor of operating system. Once this is done, you can run `npm run dev` in the front end folder to just run the front end in isolation.
 
-> Again Ubuntu instructions, I will try to go back and add windows
+The front end communicates with the backend, so running it in isolation will likely not be too useful.
 
-Make sure npm is installed:
+#### Back End
 
-```bash
-sudo apt update && sudo apt install npm 
-```
+Run one of the `dev_setup` scripts in `backend/scripts`, depending on your flavor of operating system. Once this is done, you must activate the python virtual environment which should have been created at `backend/.venv`. Instructions for this are printed at the end of the `dev_setup` output script.
 
-Install dependencies:
-```bash
-npm install
-```
+To run the backend in server mode, run `proof_server` in the command line. If you want a help menu, run `proof_server -h`.
 
-Run the development server:
+To run the backend as a command line interface, run `proof_cli`. Again, for a help menu, run `proof_cli -h`.
 
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-##### Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-##### Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-#### Back end
-
-
-##### User Setup
-
-TBD, if this is not filled out, you can just follow the developer setup instructions.
-
-##### Developer Setup
-
-Follow the instructions described in the [Command Line](#command-line-interface) section, instead running the server instead of the cli:
-
-```sh
-proof_server -h
-```
+To execute the full test suite, run `pytest` in the `backend` directory. For a help menu, run `pytest -h`
