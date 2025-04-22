@@ -31,3 +31,9 @@ class RuleRegistry:
 
     def has(self, name: str) -> bool:
         return name in self.rules or name in self.custom_rules
+    
+    def get_builtin_rules(self) -> Dict[str, Rule]:
+        return self.rules
+
+    def get_custom_rules(self) -> Dict[str, CustomRule]:
+        return self.custom_rules

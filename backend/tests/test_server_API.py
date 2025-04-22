@@ -211,3 +211,48 @@ def test_uploaded_rule_used_in_proof(client):
     }
     verify = client.post("/verify_proof", json=proof)
     assert verify.status_code == 200
+
+def test_get_rules_returns_builtin_and_custom(client):
+    # Post a valid custom rule
+    rule = {
+        "premises": [
+            {"id": "1", "formula": {"type": "var", "name": "P"}, "rule": "Assumption"},
+            {"id": "2", "formula": {"type": "var", "name": "Q"}, "rule": "Assumption"}
+        ],
+        "steps": [
+            {
+                "id": "3",
+                "formula": {
+                    "type": "and",
+                    "left": {"type": "var", "name": "P"},
+                    "right": {"type": "var", "name": "Q"}
+                },
+                "rule": "∧ Introduction",
+                "premises": ["1", "2"]
+            }
+        ],
+        "conclusions": [
+            {
+                "id": "4",
+                "formula": {
+                    "type": "and",
+                    "left": {"type": "var", "name": "P"},
+                    "right": {"type": "var", "name": "Q"}
+                },
+                "rule": "Reiteration",
+                "premises": ["3"]
+            }
+        ]
+    }
+
+    upload = client.post("/rules", json={"name": "TestConjunction", "proof": rule})
+    assert upload.status_code == 200
+
+    # Now query the rules list
+    response = client.get("/rules")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "builtin" in data
+    assert "custom" in data
+    assert "TestConjunction" in data["custom"]
+    assert "∧ Introduction" in data["builtin"]
