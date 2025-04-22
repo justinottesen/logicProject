@@ -1,6 +1,8 @@
 import { parseFormulaInput } from "@lib/parser";
 import { Statement, Step } from "@lib/logic/proof";
 import { rules } from "@lib/logic/rules";
+import { replaceSubstitutions } from "@/lib/logic/substitutions";
+import { useState } from "react";
 
 type StatementEditorProps = {
   statement: Statement;
@@ -13,17 +15,23 @@ export default function StatementEditor({
   onChange,
   deleteStatement,
 }: StatementEditorProps) {
+  const [selected, setSelected] = useState<boolean>(false);
   const handleChange = (raw: string) => {
+    raw = replaceSubstitutions(raw);
     const result = parseFormulaInput(raw);
     onChange({ ...statement, raw, result });
   };
 
   return (
-    <div className="flex flex-row w-full h-full align-middle gap-2">
-      <div className="h-full p-1 text-lg">{statement.number}</div>
+    <div className="flex flex-row w-full h-full align-middle gap-2 relative">
+      <div className="p-1 text-lg text-center grid items-center justify-center">
+        <p>{statement.number}</p>
+      </div>
       <input
         value={statement.raw}
         onChange={(e) => handleChange(e.target.value)}
+        onFocus={() => setSelected(true)}
+        onBlur={() => setSelected(false)}
         className="border px-2 py-1 rounded flex-grow-3"
         placeholder="Statement"
       />
@@ -34,7 +42,7 @@ export default function StatementEditor({
         className="border px-2 py-1 rounded flex-grow-1"
         placeholder="Parents (1,2,3)"
       />
-      
+
       <select
         value={statement.rule}
         onChange={(e) => onChange({ ...statement, rule: e.target.value })}
@@ -53,8 +61,11 @@ export default function StatementEditor({
         Delete
       </button>
 
-      {statement.result.status === "error" && (
-        <p className="text-red-600 text-sm mt-1">{statement.result.error}</p>
+      {(statement.result.status === "error" ||
+        (statement.result.status === "incomplete" && !selected)) && (
+        <div className="w-28 bg-red-100 border border-red-300 rounded flex items-center justify-center text-center">
+          <p className="text-red-600 text-xs">{statement.result.error}</p>
+        </div>
       )}
     </div>
   );

@@ -13,7 +13,10 @@ export function parseFormulaInput(raw: string): ParsedFormula {
   try {
     const formula = parseFormula(raw);
     return { status: "ok", formula };
-  } catch (err: unknown) {
+  } catch (err: any ) { 
+    if(getErrorMessage(err) === "Unexpected end of input") {
+      return { status: "incomplete", error: getErrorMessage(err) };
+    }
     return { status: "error", error: getErrorMessage(err) };
   }
 }

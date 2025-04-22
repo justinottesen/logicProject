@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProofEditor from "./components/ProofEditor";
 import { Proof } from "./lib/logic/proof";
 import { number } from "./lib/logic/numberSteps";
@@ -17,6 +17,13 @@ export default function Home() {
     if (changeNumber) number(newProof);
     setProof(newProof);
   };
+
+  useEffect(() => {
+    if (proof.steps.length === 0) return;
+    if (proof.steps[0].type !== "line") return;
+    console.log(proof.steps[0].result.status);
+
+  }, [proof]);
 
   return (
     <div className="flex flex-col w-full min-h-screen">

@@ -14,6 +14,9 @@ export class Parser {
   private current(): Token {
     return this.tokens[this.pos];
   }
+  private prevous(): Token {
+    return this.tokens[this.pos - 1];
+  }
 
   private advance(): void {
     this.pos++;
@@ -35,12 +38,18 @@ export class Parser {
   }
 
   public expectEOF(): void {
+    console.table(this.tokens);
     if (this.current().type !== "eof") {
       throw new Error("Unexpected input after formula");
     }
   }
+  public correctEnding(): boolean {
+    return this.prevous().type !== "symbol" || this.prevous().value === ")";
+  }
+
 
   public parseFormula(): Formula {
+    console.table(this.tokens);
     return this.parseIff();
   }
 
@@ -102,6 +111,10 @@ export class Parser {
 
     if (token.type === "identifier") {
       return this.parsePredicate();
+    }
+
+    if (token.type === "eof") {
+      throw new Error("Unexpected end of input");
     }
 
     throw new Error(`Unexpected token: ${JSON.stringify(token)}`);

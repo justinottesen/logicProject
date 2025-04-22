@@ -39,7 +39,8 @@ export type Goal = {
 export type ParsedFormula =
   | { status: "ok"; formula: Formula }
   | { status: "empty" }
-  | { status: "error"; error: string };
+  | { status: "error"; error: string }
+  | {status: "incomplete"; error: string}
 
 export type Step = Statement | Subproof;
 
