@@ -71,6 +71,22 @@ def register_routes(app: ProofApp):
                 "message": str(e),
                 "trace": traceback.format_exc()
             }), 400
+        
+    @app.route('/rules', methods=['GET'])
+    def list_rules_api():
+        try:
+            builtin = sorted(app.rule_registry.get_builtin_rules().keys())
+            custom = sorted(app.rule_registry.get_custom_rules().keys())
+            return jsonify({
+                "builtin": builtin,
+                "custom": custom
+            }), 200
+        except Exception as e:
+            return jsonify({
+                "error": str(e),
+                "trace": traceback.format_exc()
+            }), 500
+
 
 def main():
     parser = argparse.ArgumentParser(description="Proof Helper Flask Server")

@@ -1,333 +1,390 @@
 from functools import wraps
-from typing import Callable, Dict, List, Set
+from typing import Callable, Dict, List, Set, Optional
 from proof_helper.core.proof import Step, Statement, Subproof, Proof
 from proof_helper.core.formula import Formula, And, Or, Not, Bottom, Implies, Iff
 from proof_helper.logic.rules_custom import CustomRule
+from proof_helper.logic.rules_base import Rule
 
-# Each rule takes premises + subproofs and returns a derived formula
-RuleFn = Callable[[List[Step], Statement], bool]
-
+class AssumptionRule(Rule):
+    def name(self) -> str:
+        return "Assumption"
     
-def rule_wrapper(fn: RuleFn) -> RuleFn:
-    @wraps(fn)
-    def wrapped(supports: List[Step], statement: Statement):
-        # All statements must have rules
-        if statement.rule is None:
+    def num_supports(self) -> Optional[int]:
+        return 0
+    
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return len(supports) == 0
+    
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        return self.is_applicable(supports)
+        
+class ReiterationRule(Rule):
+    def name(self) -> str:
+        return "Reiteration"
+
+    def num_supports(self) -> Optional[int]:
+        return 1
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return len(supports) == 1 and isinstance(supports[0], Statement)
+
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
             return False
-        # Sanity check of type
-        if not isinstance(statement, Statement):
+        support = supports[0]
+        return support.formula == statement.formula
+
+
+class AndIntroductionRule(Rule):
+    def name(self) -> str:
+        return "∧ Introduction"
+
+    def num_supports(self) -> Optional[int]:
+        return None  # variable number of conjuncts allowed
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        # Must all be statements
+        return all(isinstance(s, Statement) for s in supports)
+
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
             return False
-        # Supporting steps must be before the statement
+
+        def collect_conjuncts(formula: Formula) -> Set[Formula]:
+            if isinstance(formula, And):
+                return collect_conjuncts(formula.left) | collect_conjuncts(formula.right)
+            return {formula}
+
+        statement_conjuncts = collect_conjuncts(statement.formula)
+
+        support_conjuncts: Set[Formula] = set()
         for support in supports:
-            if not support.id.is_before(statement.id):
+            support_conjuncts |= collect_conjuncts(support.formula)
+
+        return statement_conjuncts == support_conjuncts
+
+class OrIntroductionRule(Rule):
+    def name(self) -> str:
+        return "∨ Introduction"
+
+    def num_supports(self) -> Optional[int]:
+        return 1
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return len(supports) == 1 and isinstance(supports[0], Statement)
+
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+
+        def collect_disjuncts(formula: Formula) -> Set[Formula]:
+            if isinstance(formula, Or):
+                return collect_disjuncts(formula.left) | collect_disjuncts(formula.right)
+            return {formula}
+
+        disjuncts = collect_disjuncts(statement.formula)
+        return supports[0].formula in disjuncts
+class NotIntroductionRule(Rule):
+    def name(self) -> str:
+        return "¬ Introduction"
+
+    def num_supports(self) -> Optional[int]:
+        return 1
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return (
+            len(supports) == 1 and
+            isinstance(supports[0], Subproof)
+        )
+
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+
+        support = supports[0]
+        if not isinstance(statement.formula, Not):
+            return False
+
+        if support.assumption.formula != statement.formula.value:
+            return False
+
+        for step in support.steps:
+            if isinstance(step, Statement) and isinstance(step.formula, Bottom):
+                return True
+
+        return False
+    
+class BottomIntroductionRule(Rule):
+    def name(self) -> str:
+        return "⊥ Introduction"
+
+    def num_supports(self) -> Optional[int]:
+        return 2
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        if len(supports) != 2:
+            return False
+        return all(isinstance(s, Statement) for s in supports)
+
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+
+        a, b = supports
+        formulas_match = (
+            Not(a.formula) == b.formula or
+            Not(b.formula) == a.formula
+        )
+
+        return formulas_match and isinstance(statement.formula, Bottom)
+
+class ConditionalIntroductionRule(Rule):
+    def name(self) -> str:
+        return "→ Introduction"
+
+    def num_supports(self) -> Optional[int]:
+        return 1
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return (
+            len(supports) == 1 and
+            isinstance(supports[0], Subproof) and
+            bool(supports[0].steps)
+        )
+
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+
+        support = supports[0]
+        assumption = support.assumption.formula
+        last_step = support.steps[-1]
+        if not isinstance(last_step, Statement):
+            return False
+
+        return statement.formula == Implies(assumption, last_step.formula)
+
+class BiconditionalIntroductionRule(Rule):
+    def name(self) -> str:
+        return "↔ Introduction"
+
+    def num_supports(self) -> Optional[int]:
+        return 2
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        if len(supports) != 2:
+            return False
+        if not all(isinstance(s, Subproof) for s in supports):
+            return False
+        if not all(s.steps and isinstance(s.steps[-1], Statement) for s in supports):
+            return False
+        return True
+
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+
+        a, b = supports
+        a_assume, a_conclude = a.assumption.formula, a.steps[-1].formula
+        b_assume, b_conclude = b.assumption.formula, b.steps[-1].formula
+
+        expected1 = Iff(a_assume, a_conclude)
+        expected2 = Iff(b_conclude, b_assume)
+
+        return statement.formula == expected1 or statement.formula == expected2
+class AndEliminationRule(Rule):
+    def name(self) -> str:
+        return "∧ Elimination"
+
+    def num_supports(self) -> Optional[int]:
+        return 1
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return (
+            len(supports) == 1 and
+            isinstance(supports[0], Statement) and
+            isinstance(supports[0].formula, And)
+        )
+
+    def verify(self, supports: list[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+
+        def collect_conjuncts(formula: Formula) -> Set[Formula]:
+            if isinstance(formula, And):
+                return collect_conjuncts(formula.left) | collect_conjuncts(formula.right)
+            return {formula}
+
+        support_conjuncts = collect_conjuncts(supports[0].formula)
+        stmt_conjuncts = collect_conjuncts(statement.formula)
+        return stmt_conjuncts <= support_conjuncts
+
+class OrEliminationRule(Rule):
+    def name(self) -> str:
+        return "∨ Elimination"
+
+    def num_supports(self) -> Optional[int]:
+        return None  # variable number of subproofs
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        if len(supports) < 2:
+            return False
+        if not isinstance(supports[0], Statement):
+            return False
+        if not all(isinstance(s, Subproof) for s in supports[1:]):
+            return False
+        return True
+
+    def verify(self, supports: list[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+
+        disj = supports[0]
+        subproofs = supports[1:]
+
+        def collect_disjuncts(formula: Formula) -> list[Formula]:
+            if isinstance(formula, Or):
+                return collect_disjuncts(formula.left) + collect_disjuncts(formula.right)
+            return [formula]
+
+        disjuncts = collect_disjuncts(disj.formula)
+        if len(disjuncts) != len(subproofs):
+            return False
+
+        matched = set()
+        conclusion = None
+
+        for sp in subproofs:
+            if not sp.steps or not isinstance(sp.steps[-1], Statement):
                 return False
-        # Supporting steps must match statement premises
-        if set(map(lambda x: x.id, supports)) != set(statement.premises):
+            assumption = sp.assumption.formula
+            last = sp.steps[-1].formula
+
+            if conclusion is None:
+                conclusion = last
+            elif last != conclusion:
+                return False
+
+            if assumption not in disjuncts or assumption in matched:
+                return False
+            matched.add(assumption)
+
+        return conclusion == statement.formula and len(matched) == len(disjuncts)
+
+class NotEliminationRule(Rule):
+    def name(self) -> str:
+        return "¬ Elimination"
+
+    def num_supports(self) -> Optional[int]:
+        return 1
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return (
+            len(supports) == 1 and
+            isinstance(supports[0], Statement) and
+            isinstance(supports[0].formula, Not) and
+            isinstance(supports[0].formula.value, Not)
+        )
+
+    def verify(self, supports: list[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
             return False
-        return fn(supports, statement)
-    return wrapped
+        return supports[0].formula.value.value == statement.formula
 
-def assumption_rule(supports: List[Step], statement: Statement) -> bool:
-    # Assumption does not require any supporting steps (premises & subproofs)
-    return bool(not supports and statement)
+class BottomEliminationRule(Rule):
+    def name(self) -> str:
+        return "⊥ Elimination"
 
-def reiteration_rule(supports: List[Step], statement: Statement) -> bool:
-    # Must have one supporting step
-    if len(supports) != 1:
-        return False
-    support = supports[0]
+    def num_supports(self) -> Optional[int]:
+        return 1
 
-    # Support must be a statement
-    if not isinstance(support, Statement):
-        return False
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return (
+            len(supports) == 1 and
+            isinstance(supports[0], Statement) and
+            isinstance(supports[0].formula, Bottom)
+        )
 
-    # Formulas must match
-    return support.formula == statement.formula
+    def verify(self, supports: list[Step], statement: Statement) -> bool:
+        return self.is_applicable(supports)
 
-def and_introduction_rule(supports: List[Step], statement: Statement) -> bool:
-    def collect_conjuncts(formula: Formula) -> Set[Formula]:
-        if isinstance(formula, And):
-            return collect_conjuncts(formula.left) | collect_conjuncts(formula.right)
-        else:
-            return { formula }
-    
-    # Collect the top level conjunctions in the statement
-    statement_conjuncts = collect_conjuncts(statement.formula)
+class ConditionalEliminationRule(Rule):
+    def name(self) -> str:
+        return "→ Elimination"
 
-    # All supporting steps...
-    supporting_conjuncts: Set[Formula] = set()
-    for support in supports:
-        # Must be statements
-        if not isinstance(support, Statement):
+    def num_supports(self) -> Optional[int]:
+        return 2
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return (
+            len(supports) == 2 and
+            all(isinstance(s, Statement) for s in supports)
+        )
+
+    def verify(self, supports: list[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
             return False
-        supporting_conjuncts |= collect_conjuncts(support.formula)
+        a, b = supports
 
-    # Both sets of conjunctions must be subsets of each other
-    return statement_conjuncts == supporting_conjuncts
-
-def or_introduction_rule(supports: List[Step], statement: Statement) -> bool:
-    def collect_disjuncts(formula: Formula) -> Set[Formula]:
-        if isinstance(formula, Or):
-            return collect_disjuncts(formula.left) | collect_disjuncts(formula.right)
-        else:
-            return { formula }
-
-    # Only one supporting step should be cited
-    if len(supports) != 1:
-        return False
-    support = supports[0]
-
-    # Supporting step should be a statement
-    if not isinstance(support, Statement):
-        return False
-
-    # Collect disjuncts from statement
-    disjuncts = collect_disjuncts(statement.formula)
-
-    # Support should show up somewhere in the statement
-    return support.formula in disjuncts
-
-def not_introduction_rule(supports: List[Step], statement: Statement) -> bool:
-    # Only one supporting step should be cited
-    if len(supports) != 1:
-        return False
-    support = supports[0]
-
-    # Supporting step should be a subproof
-    if not isinstance(support, Subproof):
-        return False
-    
-    # Statement should be a not
-    if not isinstance(statement.formula, Not):
-        return False
-    
-    # Supporting assumption should be the inverted statement
-    inv_statement_formula = statement.formula.value
-    if support.assumption.formula != inv_statement_formula:
-        return False
-    
-    # There should be a bottom in the proof somewhere
-    for step in support.steps:
-        if not isinstance(step, Statement):
-            continue
-        if isinstance(step.formula, Bottom):
-            return True
-    return False
-
-def bottom_introduction_rule(supports: List[Step], statement: Statement) -> bool:
-    # Two support steps should be cited
-    if len(supports) != 2:
-        return False
-    support1, support2 = supports
-
-    # Each step should be a statement
-    if not isinstance(support1, Statement) or not isinstance(support2, Statement):
-        return False
-    
-    # One of them should be the negation of the other
-    if not (Not(support1.formula) == support2.formula or support1.formula == Not(support2.formula)):
-        return False
-    
-    # The statement should just be the bottom
-    return statement.formula == Bottom()
-
-def conditional_introduction_rule(supports: List[Step], statement: Statement) -> bool:
-    # Must have exactly one support
-    if len(supports) != 1:
-        return False
-    support = supports[0]
-
-    # Must be a subproof
-    if not isinstance(support, Subproof):
-        return False
-
-    # Subproof must have at least one step
-    if not support.steps:
-        return False
-
-    # Get antecedent and consequent
-    antecedent = support.assumption.formula
-    last_step = support.steps[-1]
-    if not isinstance(last_step, Statement):
-        return False
-    consequent = last_step.formula
-
-    # Conclusion must be antecedent → consequent
-    return statement.formula == Implies(antecedent, consequent)
-
-
-def biconditional_introduction_rule(supports: List[Step], statement: Statement) -> bool:
-    # Two supporting steps
-    if len(supports) != 2:
-        return False
-
-    # Both must be subproofs
-    a, b = supports
-    if not isinstance(a, Subproof) or not isinstance(b, Subproof):
-        return False
-
-    # Both must have steps
-    if not a.steps or not b.steps:
-        return False
-
-    # Both should end with a statement
-    if not isinstance(a.steps[-1], Statement) or not isinstance(b.steps[-1], Statement):
-        return False
-
-    # Get bidirectional assumptions and conclusions
-    a_assume, a_conclude = a.assumption.formula, a.steps[-1].formula
-    b_assume, b_conclude = b.assumption.formula, b.steps[-1].formula
-
-    # Valid if: a = P ⇒ Q and b = Q ⇒ P (or reversed)
-    expected1 = Iff(a_assume, a_conclude)
-    expected2 = Iff(b_conclude, b_assume)
-
-    return statement.formula == expected1 or statement.formula == expected2
-
-def and_elimination_rule(supports: List[Step], statement: Statement) -> bool:
-    # Requires 1 supporting step
-    if len(supports) != 1:
-        return False
-    support = supports[0]
-
-    # Supporting step must be a statement
-    if not isinstance(support, Statement):
-        return False
-
-    # Supporting step must be an And op
-    if not isinstance(support.formula, And):
-        return False
-
-    def collect_conjuncts(formula: Formula) -> Set[Formula]:
-        if isinstance(formula, And):
-            return collect_conjuncts(formula.left) | collect_conjuncts(formula.right)
-        else:
-            return { formula }
-    
-    # Statement must be a subset of conjunctions of the supporting statement
-    support_conjuncts = collect_conjuncts(support.formula)
-    statement_conjuncts = collect_conjuncts(statement.formula)
-
-    return statement_conjuncts <= support_conjuncts
-
-def or_elimination_rule(supports: List[Step], statement: Statement) -> bool:
-    if len(supports) < 2:
-        return False
-
-    disj_step = supports[0]
-    subproofs = supports[1:]
-
-    # Check disjunction is a statement
-    if not isinstance(disj_step, Statement):
-        return False
-    
-
-    def collect_disjuncts(formula: Formula) -> List[Formula]:
-        if isinstance(formula, Or):
-            return collect_disjuncts(formula.left) + collect_disjuncts(formula.right)
-        return [formula]
-    disjuncts = collect_disjuncts(disj_step.formula)
-
-    # Must be one subproof per disjunct
-    if len(disjuncts) != len(subproofs):
-        return False
-
-    # Must match disjuncts in any order
-    matched = set()
-    result_formula = None
-
-    for sp in subproofs:
-        if not isinstance(sp, Subproof):
-            return False
-        if not sp.steps or not isinstance(sp.steps[-1], Statement):
+        if not isinstance(a, Statement) or not isinstance(b, Statement):
             return False
 
-        assumption = sp.assumption.formula
-        conclusion = sp.steps[-1].formula
-
-        if result_formula is None:
-            result_formula = conclusion
-        elif result_formula != conclusion:
-            return False
-
-        if assumption not in disjuncts:
-            return False
-        if assumption in matched:
-            return False  # no double-handling
-        matched.add(assumption)
-
-    return result_formula == statement.formula and len(matched) == len(disjuncts)
-
-def not_elimination_rule(supports: List[Step], statement: Statement) -> bool:
-    # Requires 1 supporting step
-    if len(supports) != 1:
-        return False
-    support = supports[0]
-
-    # Support must be a statement
-    if not isinstance(support, Statement):
-        return False
-    
-    # Support must be a double negation
-    if not isinstance(support.formula, Not):
-        return False
-    if not isinstance(support.formula.value, Not):
-        return False
-    
-    # Conclusion must match the unwrapped support
-    return support.formula.value.value == statement.formula
-
-def bottom_elimination_rule(supports: List[Step], statement: Statement) -> bool:
-    # Requires 1 supporting step
-    if len(supports) != 1:
-        return False
-    support = supports[0]
-
-    # Support must be a statement
-    if not isinstance(support, Statement):
-        return False
-    
-    # Support must be a bottom
-    if not isinstance(support.formula, Bottom):
-        return False
-    
-    # Statement can be whatever
-    return True
-
-def conditional_elimination_rule(supports: List[Step], statement: Statement) -> bool:
-    if len(supports) != 2:
-        return False
-
-    a, b = supports
-    if not isinstance(a, Statement) or not isinstance(b, Statement):
-        return False
-
-    # Check both orders
-    if isinstance(a.formula, Implies) and a.formula.left == b.formula:
-        return statement.formula == a.formula.right
-    if isinstance(b.formula, Implies) and b.formula.left == a.formula:
-        return statement.formula == b.formula.right
-
-    return False
-
-def biconditional_elimination_rule(supports: List[Step], statement: Statement) -> bool:
-    if len(supports) != 2:
-        return False
-
-    a, b = supports
-    if not isinstance(a, Statement) or not isinstance(b, Statement):
-        return False
-
-    if isinstance(a.formula, Iff):
-        if a.formula.left == b.formula:
+        if isinstance(a.formula, Implies) and a.formula.left == b.formula:
             return statement.formula == a.formula.right
-        if a.formula.right == b.formula:
-            return statement.formula == a.formula.left
-
-    if isinstance(b.formula, Iff):
-        if b.formula.left == a.formula:
+        if isinstance(b.formula, Implies) and b.formula.left == a.formula:
             return statement.formula == b.formula.right
-        if b.formula.right == a.formula:
-            return statement.formula == b.formula.left
 
-    return False
+        return False
+
+
+class BiconditionalEliminationRule(Rule):
+    def name(self) -> str:
+        return "↔ Elimination"
+
+    def num_supports(self) -> Optional[int]:
+        return 2
+
+    def is_applicable(self, supports: list[Step]) -> bool:
+        return (
+            len(supports) == 2 and
+            all(isinstance(s, Statement) for s in supports)
+        )
+
+    def verify(self, supports: list[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
+            return False
+        a, b = supports
+
+        if not isinstance(a, Statement) or not isinstance(b, Statement):
+            return False
+
+        if isinstance(a.formula, Iff):
+            if a.formula.left == b.formula:
+                return statement.formula == a.formula.right
+            if a.formula.right == b.formula:
+                return statement.formula == a.formula.left
+
+        if isinstance(b.formula, Iff):
+            if b.formula.left == a.formula:
+                return statement.formula == b.formula.right
+            if b.formula.right == a.formula:
+                return statement.formula == b.formula.left
+
+        return False
+
+BUILTIN_RULES: list[Rule] = [
+    AssumptionRule(),
+    ReiterationRule(),
+    AndIntroductionRule(),
+    AndEliminationRule(),
+    OrIntroductionRule(),
+    OrEliminationRule(),
+    NotIntroductionRule(),
+    NotEliminationRule(),
+    BottomIntroductionRule(),
+    BottomEliminationRule(),
+    ConditionalIntroductionRule(),
+    ConditionalEliminationRule(),
+    BiconditionalIntroductionRule(),
+    BiconditionalEliminationRule(),
+]

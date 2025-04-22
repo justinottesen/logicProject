@@ -39,7 +39,7 @@ def test_custom_rule_and_intro_success():
     proof = Proof(premises=[A, B], steps=[AB], conclusions=[AB])
     rule = CustomRule("Test ∧ Intro", proof)
 
-    result = rule([A, B], AB)
+    result = rule.verify([A, B], AB)
     assert result is True
 
 def test_custom_rule_wrong_premise_formula():
@@ -54,7 +54,7 @@ def test_custom_rule_wrong_premise_formula():
     rule = CustomRule("Test ∧ Intro", proof)
 
     bad = stmt("0", R, rule="Assumption")
-    result = rule([A, bad], AB)
+    result = rule.verify([A, bad], AB)
     assert result is False
 
 def test_custom_rule_wrong_conclusion_formula():
@@ -68,7 +68,7 @@ def test_custom_rule_wrong_conclusion_formula():
     proof = Proof(premises=[A, B], steps=[AB], conclusions=[AB])
     rule = CustomRule("Test ∧ Intro", proof)
 
-    result = rule([A, B], Wrong)
+    result = rule.verify([A, B], Wrong)
     assert result is False
 
 def test_save_and_load_custom_rule(temp_rule_dir):

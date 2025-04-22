@@ -1,29 +1,34 @@
 from proof_helper.core.proof import Proof, Step, Statement
-from typing import List
+from proof_helper.core.formula import Formula
+from proof_helper.logic.rules_base import Rule
+from typing import List, Optional
 
-class CustomRule:
+class CustomRule(Rule):
     def __init__(self, name: str, proof: Proof):
-        self.name = name
-        self.proof = proof # Proof must be validated before construction
-        self.conclusions = proof.conclusions
+        self._name = name
+        self.proof = proof  # Assumes proof is already validated
         self.premises = proof.premises
+        self.conclusions = proof.conclusions
 
-    def __call__(self, supports: List[Step], statement: Statement) -> bool:
-        # Must have same number of supports as statements
+    def name(self) -> str:
+        return self._name
+
+    def num_supports(self) -> Optional[int]:
+        return len(self.premises)
+
+    def is_applicable(self, supports: List[Step]) -> bool:
         if len(supports) != len(self.premises):
             return False
+        return all(isinstance(s, Statement) for s in supports)
 
-        # All supports must be statements
-        if not all(isinstance(s, Statement) for s in supports):
+    def verify(self, supports: List[Step], statement: Statement) -> bool:
+        if not self.is_applicable(supports):
             return False
 
-        # Match premise formulas
         given_formulas = {s.formula for s in supports}
         expected_formulas = {p.formula for p in self.premises}
 
         if given_formulas != expected_formulas:
             return False
 
-        # Statement formula must match one of the rule's conclusions
         return any(statement.formula == c.formula for c in self.conclusions)
-

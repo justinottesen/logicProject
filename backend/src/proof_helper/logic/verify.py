@@ -9,25 +9,44 @@ class VerificationError(NamedTuple):
 
 VerificationResult = Union[bool, VerificationError]
 
-def verify_statement(statement: Statement, proof: Proof, rule_checker: RuleRegistry) -> VerificationResult:
+def verify_statement(statement: Statement, proof: Proof, checker: RuleRegistry) -> VerificationResult:
+    # Check rule presence
     if statement.rule is None:
-        return VerificationError(str(statement.id), "Missing rule on statement")
+        return VerificationError(step_id=str(statement.id), message="Missing rule on statement")
+    if not checker.has(statement.rule):
+        return VerificationError(step_id=str(statement.id), message=f"Unknown rule: {statement.rule}")
 
-    if not rule_checker.has(statement.rule):
-        return VerificationError(str(statement.id), f"Unknown rule: {statement.rule}")
-
-    supports: List[Step] = []
+    # Collect supporting steps
+    supports: list[Step] = []
     for pid in statement.premises:
         step = proof.get_step(pid)
         if step is None:
-            return VerificationError(str(statement.id), f"Referenced step {pid} not found")
+            return VerificationError(step_id=str(statement.id), message=f"Referenced step {pid} not found")
         supports.append(step)
 
-    rule_fn = rule_checker.get(statement.rule)
-    if not rule_fn(supports, statement):
-        return VerificationError(str(statement.id), f"Rule {statement.rule} failed to apply")
+    # Check all supports occur before the current step
+    for support in supports:
+        if not support.id.is_before(statement.id):
+            return VerificationError(
+                step_id=str(statement.id),
+                message=f"Step {support.id} must occur before {statement.id}"
+            )
 
-    return True
+    # Check the cited steps match the premises
+    actual_ids = {s.id for s in supports}
+    expected_ids = set(statement.premises)
+    if actual_ids != expected_ids:
+        return VerificationError(
+            step_id=str(statement.id),
+            message="Mismatch between cited step IDs and premise list"
+        )
+
+    # Run the rule’s verify method
+    rule = checker.get(statement.rule)
+    if rule.verify(supports, statement):
+        return True
+    else:
+        return VerificationError(step_id=str(statement.id), message=f"Rule {statement.rule} failed to apply")
 
 def verify_subproof(subproof: Subproof, proof: Proof, rule_checker: RuleRegistry) -> VerificationResult:
     if not isinstance(subproof.assumption, Statement):
