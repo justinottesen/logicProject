@@ -16,7 +16,7 @@ export type Statement = {
   raw: string;
   result: ParsedFormula;
   rule: string;
-  parents: Statement[];
+  parents: number[];
   parentsRaw: string;
   number: number;
 };
@@ -34,6 +34,7 @@ export type Goal = {
   result: ParsedFormula;
   rule: "none";
   number: number;
+  parent: number;
 }
 
 export type ParsedFormula =

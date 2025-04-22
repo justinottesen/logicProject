@@ -32,6 +32,20 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       result: parseFormulaInput(raw),
       rule: "none",
       number: index + 1,
+      parent: 0,
+    };
+    setProof({ ...proof, goals: newGoals });
+  };
+
+  const updateGoalParent = (index: number, parent: string) => {
+    const newGoals = [...proof.goals];
+    newGoals[index] = {
+      type: "goal",
+      raw: newGoals[index].raw,
+      result: newGoals[index].result,
+      rule: "none",
+      number: index + 1,
+      parent: parseInt(parent),
     };
     setProof({ ...proof, goals: newGoals });
   };
@@ -212,8 +226,15 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
               <input
                 value={g.raw}
                 onChange={(e) => updateGoalRaw(i, e.target.value)}
-                className="border px-2 py-1 rounded w-full"
+                className="border px-2 py-1 flex-grow-3 rounded w-full"
                 placeholder={`Goal ${i + 1}`}
+              />
+              <input
+                type="number"
+                value={g.parent}
+                onChange={(e) => updateGoalParent(i, e.target.value)}
+                className="border px-2 py-1 flex-grow-1 rounded w-full"
+                placeholder={`Parent ${i + 1}`}
               />
               <button
                 onClick={() => deleteGoal(i)}
