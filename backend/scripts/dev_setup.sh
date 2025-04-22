@@ -25,4 +25,4 @@ pip install -e ".[dev]"
 
 echo "Setup complete."
 echo "Remember to activate the environment next time with:"
-echo "  source .venv/bin/activate"
+echo "  source '$BACKEND_ROOT/.venv/bin/activate'"
