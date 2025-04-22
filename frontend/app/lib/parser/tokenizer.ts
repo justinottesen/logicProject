@@ -1,7 +1,7 @@
 export type Token = 
   | { type: "identifier"; value: string }
   | { type: "symbol"; value: string }
-  | { type: "eof" };
+  | { type: "eof"; value?: undefined };
 
   export function tokenize(input: string): Token[] {
     const tokens: Token[] = [];

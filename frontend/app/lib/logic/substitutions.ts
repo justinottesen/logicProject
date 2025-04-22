@@ -19,6 +19,5 @@ const pattern: string = Object.keys(shortcuts)
 const regex = new RegExp(pattern, 'g');
 
 export const replaceSubstitutions = (text: string) => {
-    console.log(text);
     return text.replace(regex, (match) => shortcuts[match])
 };

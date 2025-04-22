@@ -1,7 +1,7 @@
 // app/lib/parser/parser.ts
 
 import { Token } from "./tokenizer";
-import { Formula, Predicate, Term } from "frontend/app/lib/logic/logic";
+import { Formula, Predicate, Term } from "@/lib/logic/logic";
 
 export class Parser {
   private tokens: Token[];
@@ -50,7 +50,7 @@ export class Parser {
     let left = this.parseImplies();
     while (this.matchSymbol("↔")) {
       const right = this.parseImplies();
-      left = { type: "iff", left, right };
+      left = { type: "iff", left, right, value: "↔" };
     }
     return left;
   }
@@ -59,7 +59,7 @@ export class Parser {
     let left = this.parseOr();
     while (this.matchSymbol("→")) {
       const right = this.parseOr();
-      left = { type: "implies", left, right };
+      left = { type: "implies", left, right, value: "→" };
     }
     return left;
   }
@@ -68,7 +68,7 @@ export class Parser {
     let left = this.parseAnd();
     while (this.matchSymbol("∨")) {
       const right = this.parseAnd();
-      left = { type: "or", left, right };
+      left = { type: "or", left, right, value: "∨" };
     }
     return left;
   }
@@ -77,7 +77,7 @@ export class Parser {
     let left = this.parseUnary();
     while (this.matchSymbol("∧")) {
       const right = this.parseUnary();
-      left = { type: "and", left, right };
+      left = { type: "and", left, right, value: "∧" };
     }
     return left;
   }
@@ -85,9 +85,9 @@ export class Parser {
   private parseUnary(): Formula {
     if (this.matchSymbol("¬")) {
       const operand = this.parseUnary();
-      return { type: "not", operand };
+      return { type: "not", operand, value: "¬" };
     }
-    return this.parseQuantifier();
+    return this.parsePrimary();
   }
 
   private parsePrimary(): Formula {
@@ -141,37 +141,4 @@ export class Parser {
 
     return { type: "predicate", name, args };
   }
-
-  private parseQuantifier(): Formula {
-    const token = this.current();
-  
-    let quantifierType: "forall" | "exists" | null = null;
-  
-    if (token.type === "symbol" && token.value === "∀") {
-      quantifierType = "forall";
-    } else if (token.type === "symbol" && token.value === "∃") {
-      quantifierType = "exists";
-    }
-  
-    if (!quantifierType) {
-      return this.parsePrimary(); // defer to next rule
-    }
-  
-    this.advance(); // consume ∀ or ∃
-  
-    const varToken = this.current();
-    if ((varToken.type !== "identifier" || !/^[a-z]$/.test(varToken.value))) {
-      throw new Error(`Expected variable name after '${token.value}'`);
-    }
-  
-    this.advance(); // consume variable name
-  
-    const body = this.parseFormula(); // not parseUnary — we allow full formulas here
-  
-    return {
-      type: quantifierType,
-      variable: { type: "variable", name: varToken.value },
-      body: body,
-    };
-  }  
 }

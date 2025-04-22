@@ -1,7 +1,5 @@
 // === Term-level: Constants and Variables ===
 
-import exp from "constants";
-
 export type Constant = {
   type: "constant";
   name: string; // e.g., "alice", "a"
@@ -69,25 +67,7 @@ export type NotEquals = {
 
 export type BinaryConnective = And | Or | Implies | Iff;
 
-// === Quantifiers ===
-export type ForAll = {
-  type: "forall";
-  variable: Variable;
-  body: Formula;
-  value: '∀';
-};
-
-export type Exists = {
-  type: "exists";
-  variable: Variable;
-  body: Formula;
-  value: '∃';
-};
-
-export type Quantifier = ForAll | Exists;
-// === Formula (well-formed sentence) ===
 export type Formula =
   | Predicate
   | Not
-  | BinaryConnective
-  | Quantifier;
+  | BinaryConnective;

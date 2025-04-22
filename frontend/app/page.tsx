@@ -14,11 +14,9 @@ export default function Home() {
   });
 
   const changeProof = (newProof: Proof, changeNumber?: boolean) => {
-    if(changeNumber) number(newProof);
+    if (changeNumber) number(newProof);
     setProof(newProof);
   };
-
-
 
   return (
     <div className="flex flex-col w-full min-h-screen">

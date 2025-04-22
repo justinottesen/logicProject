@@ -13,7 +13,6 @@ type ProofEditorProps = {
 
 export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
   const updatePremiseRaw = (index: number, raw: string) => {
-    console.log("Updating premise", index, "to", raw);
     const newPremises = [...proof.premises];
     newPremises[index] = {
       type: "premise",
