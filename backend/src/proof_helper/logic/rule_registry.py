@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from proof_helper.core.proof import Step, Statement, Proof
 from proof_helper.logic.rules_base import Rule
 from proof_helper.logic.rules_builtin import BUILTIN_RULES
@@ -37,3 +37,6 @@ class RuleRegistry:
 
     def get_custom_rules(self) -> Dict[str, CustomRule]:
         return self.custom_rules
+    
+    def get_all_rules(self) -> List[Rule]:
+        return list(self.rules.values()) + list(self.custom_rules.values())
