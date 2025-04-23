@@ -1,4 +1,5 @@
 import { Constant, Formula } from "@lib/logic/logic";
+import { ShortRules } from "./rules";
 
 // === Step Types ===
 
@@ -8,17 +9,17 @@ export type Subproof = {
   raw: string;
   steps: Step[];
   constantsRaw: string;
-  number: number;
+  number: string;
 }
 
 export type Statement = {
   type: "line";
   raw: string;
   result: ParsedFormula;
-  rule: string;
-  parents: number[];
+  rule: ShortRules | "none";
+  parents: string[];
   parentsRaw: string;
-  number: number;
+  number: string;
 };
 
 export type Premise = {
@@ -26,15 +27,15 @@ export type Premise = {
   raw: string;
   result: ParsedFormula;
   rule: "none";
-  number: number;
+  number: string;
 }
 export type Goal = {
   type: "goal";
   raw: string;
   result: ParsedFormula;
   rule: "none";
-  number: number;
-  parent: number;
+  number: string;
+  parent: string;
 }
 
 export type ParsedFormula =

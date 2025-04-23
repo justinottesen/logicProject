@@ -1,6 +1,6 @@
 import { Formula } from "./logic/logic";
 import { ParsedFormula, Proof, Step } from "./logic/proof";
-import { FullNames } from "./logic/rules";
+import { FullNames, rulesFullName, ShortRules } from "./logic/rules";
 
 
 
@@ -87,7 +87,6 @@ export const convert = (proof: Proof) => {
         });
         i++;
     }
-    number(converted);
     return converted;
 }
 
@@ -165,7 +164,7 @@ const convertStep = (step: Step): ConvertedStep => {
         const convertedStep: ConvertedStatement = {
             id: step.number + "",
             formula: emptyConvertedFormula,
-            rule: step.rule as AllRules,
+            rule: convertRule(step.rule),
             premises: step.parents.map((parent) => parent + "")
         };
         convertedStep.formula = convertToFormula(step.result);
@@ -175,37 +174,10 @@ const convertStep = (step: Step): ConvertedStep => {
         throw new Error("Unknown step type");
     }
 }
-
-const number = (proof: Converted) => {
-    let i = 1;
-    for (const premise of proof.premises) {
-        premise.id = i + "";
-        i++;
-    }
-    for (const step of proof.steps) {
-        numberSubproofs(step, i + "");
-        i++;
-    }
-    for (const conclusion of proof.conclusions) {
-        conclusion.id = i + "";
-        i++;
-    }
+const convertRule = (rule: ShortRules | "none"): FullNames => {
+    if (rule === "none") throw new Error("Rule is none");
+    return rulesFullName[rule] as FullNames;
 }
 
-const numberSubproofs = (step: ConvertedStep, index: string) => {
-    if (step.rule === "Assumption") {
-        step.id = index;
-        let i = 1;
-        for (const substep of step.steps) {
-            numberSubproofs(substep, index + "." + i);
-            i++;
-        }
-        console.log("step", step.id);
-    }
-    else {
-        step.id = index;
-        console.log("step", step.id);
-    }
-}
 
 

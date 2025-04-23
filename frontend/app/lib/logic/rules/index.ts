@@ -13,7 +13,9 @@ export const rules = [
     "↔Intro",
 ]
 
-export const rulesFullName = {
+type FullNamesObject = Record<ShortRules, string>;
+
+export const rulesFullName: FullNamesObject = {
     "∧Elim": "∧ Elimination",
     "∨Elim": "∨ Elimination",
     "¬Elim": "¬ Elimination",
@@ -26,7 +28,7 @@ export const rulesFullName = {
     "⊥Intro": "⊥ Introduction",
     "→Intro": "→ Introduction",
     "↔Intro": "↔ Introduction",
-}
+};
 
 export const rulesFullNames = [
     "∧ Elimination",
@@ -42,5 +44,5 @@ export const rulesFullNames = [
     "→ Introduction",
     "↔ Introduction",
 ]
-
+export type ShortRules = "∧Elim" | "∨Elim" | "¬Elim" | "⊥Elim" | "→Elim" | "↔Elim" | "∧Intro" | "∨Intro" | "¬Intro" | "⊥Intro" | "→Intro" | "↔Intro";
 export type FullNames = "∧ Elimination" | "∨ Elimination" | "¬ Elimination" | "⊥ Elimination" | "→ Elimination" | "↔ Elimination" | "∧ Introduction" | "∨ Introduction" | "¬ Introduction" | "⊥ Introduction" | "→ Introduction" | "↔ Introduction";

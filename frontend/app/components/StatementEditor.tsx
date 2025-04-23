@@ -1,6 +1,6 @@
 import { parseFormulaInput } from "@lib/parser";
 import { Statement, Step } from "@lib/logic/proof";
-import { rules } from "@lib/logic/rules";
+import { rules, ShortRules } from "@lib/logic/rules";
 import { replaceSubstitutions } from "@/lib/logic/substitutions";
 import { useState } from "react";
 
@@ -45,7 +45,7 @@ export default function StatementEditor({
 
       <select
         value={statement.rule}
-        onChange={(e) => onChange({ ...statement, rule: e.target.value })}
+        onChange={(e) => onChange({ ...statement, rule: e.target.value as ShortRules })}
         className="border px-2 py-1 rounded ml-2"
       >
         {rules.map((rule) => (

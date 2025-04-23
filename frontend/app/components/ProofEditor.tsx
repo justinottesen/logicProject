@@ -19,7 +19,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw: replaceSubstitutions(raw),
       result: parseFormulaInput(replaceSubstitutions(raw)),
       rule: "none",
-      number: index + 1,
+      number: index + 1 + "",
     };
     setProof({ ...proof, premises: newPremises });
   };
@@ -31,7 +31,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw: replaceSubstitutions(raw),
       result: parseFormulaInput(replaceSubstitutions(raw)),
       rule: "none",
-      number: index + 1,
+      number: index + 1 + "",
       parent: newGoals[index].parent,
     };
     setProof({ ...proof, goals: newGoals });
@@ -44,8 +44,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw: newGoals[index].raw,
       result: newGoals[index].result,
       rule: "none",
-      number: index + 1,
-      parent: parseInt(parent),
+      number: index + 1  + "",
+      parent: parent,
     };
     setProof({ ...proof, goals: newGoals });
   };
@@ -56,7 +56,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw: "",
       result: parseFormulaInput(""),
       rule: "none",
-      number: 0,
+      number: "",
     } as Premise;
     setProof(
       {
@@ -73,8 +73,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw: "",
       result: parseFormulaInput(""),
       rule: "none",
-      number: 0,
-      parent: 0,
+      number: "",
+      parent: "",
     } as Goal;
     setProof(
       {
@@ -120,7 +120,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
             rule: "∧Elim",
             parents: [],
             parentsRaw: "",
-            number: 0,
+            number: "",
           },
         ],
       },
@@ -143,12 +143,12 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
               rule: "none",
               parents: [],
               parentsRaw: "",
-              number: 0,
+              number: "",
             },
             steps: [],
             raw: "",
             constantsRaw: "",
-            number: 0,
+            number: "",
           },
         ],
       },
@@ -232,7 +232,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
               />
               <input
                 type="text"
-                value={(isNaN(g.parent) || g.parent <= 0) ? "" : g.parent}
+                value={g.parent}
                 onChange={(e) => updateGoalParent(i, e.target.value)}
                 className="border px-2 py-1 flex-grow-1 rounded w-full"
                 placeholder={`Parent ${i + 1}`}
