@@ -8,6 +8,9 @@ class CustomRuleStore:
     def __init__(self, directory: str):
         self.directory = directory
         os.makedirs(self.directory, exist_ok=True)
+    
+    def get_path(self):
+        return os.path.abspath(self.directory)
 
     def save_rule(self, name: str, raw_json: dict) -> None:
         path = os.path.join(self.directory, f"{name}.json")

@@ -136,4 +136,5 @@ def main():
     app = ProofApp(__name__, rules_dir=args.rules_dir)
     CORS(app)
     register_routes(app)
+    print(f"Running with custom rule directory as {app.custom_rule_store.get_path()}")
     app.run(debug=args.debug, port=args.port)
