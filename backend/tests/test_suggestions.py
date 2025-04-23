@@ -36,7 +36,7 @@ def test_suggestion_and_intro():
     suggestions = generate_next_steps(proof, registry)
 
     assert any(
-        s.formula == And(P, Q) and s.rule == "∧ Introduction"
+        s.formula == And(P, Q) and s.rule == "And Introduction"
         for s, score in suggestions
     )
 
@@ -64,7 +64,7 @@ def test_suggestion_implies_intro():
     suggestions = generate_next_steps(proof, registry)
 
     assert any(
-        s.formula == Implies(P, Q) and s.rule == "→ Introduction"
+        s.formula == Implies(P, Q) and s.rule == "Implication Introduction"
         for s, score in suggestions
     )
 
@@ -78,7 +78,7 @@ def test_suggestion_or_intro():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == Or(P, Q) and s.rule == "∨ Introduction" for s, _ in suggestions)
+    assert any(s.formula == Or(P, Q) and s.rule == "Or Introduction" for s, _ in suggestions)
 
 def test_suggestion_not_intro():
     P = Variable("P")
@@ -86,7 +86,7 @@ def test_suggestion_not_intro():
         id=sid("1"),
         assumption=stmt("1.1", P, "Assumption"),
         steps=[
-            stmt("1.2", Bottom(), "⊥ Introduction", ["1.1", "1.1"])
+            stmt("1.2", Bottom(), "Bottom Introduction", ["1.1", "1.1"])
         ]
     )
     proof = Proof(
@@ -96,7 +96,7 @@ def test_suggestion_not_intro():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == Not(P) and s.rule == "¬ Introduction" for s, _ in suggestions)
+    assert any(s.formula == Not(P) and s.rule == "Not Introduction" for s, _ in suggestions)
 
 def test_suggestion_bottom_intro():
     P = Variable("P")
@@ -108,7 +108,7 @@ def test_suggestion_bottom_intro():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(isinstance(s.formula, Bottom) and s.rule == "⊥ Introduction" for s, _ in suggestions)
+    assert any(isinstance(s.formula, Bottom) and s.rule == "Bottom Introduction" for s, _ in suggestions)
 
 def test_suggestion_double_negation_elim():
     P = Variable("P")
@@ -120,7 +120,7 @@ def test_suggestion_double_negation_elim():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == P and s.rule == "¬ Elimination" for s, _ in suggestions)
+    assert any(s.formula == P and s.rule == "Not Elimination" for s, _ in suggestions)
 
 def test_or_intro_single_disjunct_goal():
     P = Variable("P")
@@ -132,7 +132,7 @@ def test_or_intro_single_disjunct_goal():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == Or(P, Q) and s.rule == "∨ Introduction" for s, _ in suggestions)
+    assert any(s.formula == Or(P, Q) and s.rule == "Or Introduction" for s, _ in suggestions)
 
 def test_or_intro_nested_disjunction_goal():
     P, Q, R = Variable("P"), Variable("Q"), Variable("R")
@@ -143,7 +143,7 @@ def test_or_intro_nested_disjunction_goal():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == Or(Or(P, Q), R) and s.rule == "∨ Introduction" for s, _ in suggestions)
+    assert any(s.formula == Or(Or(P, Q), R) and s.rule == "Or Introduction" for s, _ in suggestions)
 
 def test_or_intro_multiple_possible_disjuncts():
     P, Q = Variable("P"), Variable("Q")
@@ -154,7 +154,7 @@ def test_or_intro_multiple_possible_disjuncts():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == Or(Q, P) and s.rule == "∨ Introduction" for s, _ in suggestions)
+    assert any(s.formula == Or(Q, P) and s.rule == "Or Introduction" for s, _ in suggestions)
 
 def test_or_intro_no_goal_generates_default_or():
     P = Variable("P")
@@ -165,7 +165,7 @@ def test_or_intro_no_goal_generates_default_or():
     )
     registry = RuleRegistry()
     suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == Or(P, P) and s.rule == "∨ Introduction" for s, _ in suggestions)
+    assert any(s.formula == Or(P, P) and s.rule == "Or Introduction" for s, _ in suggestions)
 
 def f_var(name):
     return { "type": "var", "name": name }
@@ -191,7 +191,7 @@ def test_custom_rule_suggestion():
             {"id": "2", "formula": f_var("Q"), "rule": "Assumption"}
         ],
         "steps": [
-            {"id": "3", "formula": f_and(f_var("P"), f_var("Q")), "rule": "∧ Introduction", "premises": ["1", "2"]}
+            {"id": "3", "formula": f_and(f_var("P"), f_var("Q")), "rule": "And Introduction", "premises": ["1", "2"]}
         ],
         "conclusions": [
             {"id": "4", "formula": f_and(f_var("P"), f_var("Q")), "rule": "Reiteration", "premises": ["3"]}

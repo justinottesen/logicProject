@@ -30,7 +30,7 @@ def generate_next_steps(proof: Proof, registry: RuleRegistry) -> List[Tuple[Stat
                 continue
 
             # Use conclude() to generate possible resulting formulas
-            if rule.name() in { "∨ Introduction" }:
+            if rule.name() in { "Or Introduction" }:
                 new_formulas = rule.conclude(list(support_set), [c.formula for c in proof.conclusions] or None)
             else:
                 new_formulas = rule.conclude(list(support_set))

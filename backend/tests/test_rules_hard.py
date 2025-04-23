@@ -44,9 +44,9 @@ def test_nested_and_intro_then_elim():
     a = stmt("1", P)
     b = stmt("2", Q)
     c = stmt("3", R)
-    ab = stmt("4", And(a.formula, b.formula), "∧ Introduction", [sid("1"), sid("2")])
-    abc = stmt("5", And(ab.formula, c.formula), "∧ Introduction", [sid("4"), sid("3")])
-    extracted = stmt("6", b.formula, "∧ Elimination", [stmt("4", ab.formula)])
+    ab = stmt("4", And(a.formula, b.formula), "And Introduction", [sid("1"), sid("2")])
+    abc = stmt("5", And(ab.formula, c.formula), "And Introduction", [sid("4"), sid("3")])
+    extracted = stmt("6", b.formula, "And Elimination", [stmt("4", ab.formula)])
 
     assert and_introduction_rule.verify([a, b], ab)
     assert and_introduction_rule.verify([ab, c], abc)
@@ -58,9 +58,9 @@ def test_chain_of_implications_intro_elim():
     pq = stmt("1.2", Q)
     pq_proof = subproof("1", assume_P, [pq])
 
-    pq_implies = stmt("2", Implies(P, Q), "→ Introduction", [sid("1")])
+    pq_implies = stmt("2", Implies(P, Q), "Implication Introduction", [sid("1")])
     pq_stmt = stmt("3", P)
-    q_stmt = stmt("4", Q, "→ Elimination", [sid("2"), sid("3")])
+    q_stmt = stmt("4", Q, "Implication Elimination", [sid("2"), sid("3")])
 
     assert conditional_introduction_rule.verify([pq_proof], pq_implies)
     assert conditional_elimination_rule.verify([pq_implies, pq_stmt], q_stmt)
@@ -69,7 +69,7 @@ def test_biconditional_elim_then_intro():
     P, Q = Variable("P"), Variable("Q")
     bicond = stmt("1", Iff(P, Q))
     p_stmt = stmt("2", P)
-    q_stmt = stmt("3", Q, "↔ Elimination", [sid("1"), sid("2")])
+    q_stmt = stmt("3", Q, "Biconditional Elimination", [sid("1"), sid("2")])
 
     assume_p = stmt("4.1", P)
     derive_q = stmt("4.2", Q)
@@ -79,7 +79,7 @@ def test_biconditional_elim_then_intro():
     derive_p = stmt("5.2", P)
     proof2 = subproof("5", assume_q, [derive_p])
 
-    reformed_bicond = stmt("6", Iff(P, Q), "↔ Introduction", [sid("4"), sid("5")])
+    reformed_bicond = stmt("6", Iff(P, Q), "Biconditional Introduction", [sid("4"), sid("5")])
 
     assert biconditional_elimination_rule.verify([bicond, p_stmt], q_stmt)
     assert biconditional_introduction_rule.verify([proof1, proof2], reformed_bicond)
@@ -91,22 +91,22 @@ def test_or_elim_with_3_disjuncts_nested_conclusion():
     sp1 = subproof("2", stmt("2.1", A), [stmt("2.2", R)])
     sp2 = subproof("3", stmt("3.1", B), [stmt("3.2", R)])
     sp3 = subproof("4", stmt("4.1", C), [stmt("4.2", R)])
-    result = stmt("5", R, "∨ Elimination", [sid("1"), sid("2"), sid("3"), sid("4")])
+    result = stmt("5", R, "Or Elimination", [sid("1"), sid("2"), sid("3"), sid("4")])
 
     assert or_elimination_rule.verify([disj_stmt, sp1, sp2, sp3], result)
 
 def test_double_negation_chain():
     P = Variable("P")
     nnP = stmt("1", Not(Not(P)))
-    extracted = stmt("2", P, "¬ Elimination", [sid("1")])
-    repacked = stmt("3", Not(Not(P)), "¬ Introduction", [sid("2")])  # [P] ... ⊥
+    extracted = stmt("2", P, "Not Elimination", [sid("1")])
+    repacked = stmt("3", Not(Not(P)), "Not Introduction", [sid("2")])  # [P] ... ⊥
 
     assert not_elimination_rule.verify([nnP], extracted)
     # For repacked to pass, it needs to be within a subproof deriving ⊥, so just verifying symmetry shape here
 
 def test_explosion_to_anything():
     contradiction = stmt("1", Bottom())
-    derived = stmt("2", Variable("Z"), "⊥ Elimination", [sid("1")])
+    derived = stmt("2", Variable("Z"), "Bottom Elimination", [sid("1")])
     assert bottom_elimination_rule.verify([contradiction], derived)
 
 def test_buried_and_elim_from_3layer_intro():
@@ -114,9 +114,9 @@ def test_buried_and_elim_from_3layer_intro():
     a = stmt("1", A)
     b = stmt("2", B)
     c = stmt("3", C)
-    ab = stmt("4", And(a.formula, b.formula), "∧ Introduction", [sid("1"), sid("2")])
-    abc = stmt("5", And(ab.formula, c.formula), "∧ Introduction", [sid("4"), sid("3")])
-    final = stmt("6", B, "∧ Elimination", [stmt("4", ab.formula)])
+    ab = stmt("4", And(a.formula, b.formula), "And Introduction", [sid("1"), sid("2")])
+    abc = stmt("5", And(ab.formula, c.formula), "And Introduction", [sid("4"), sid("3")])
+    final = stmt("6", B, "And Elimination", [stmt("4", ab.formula)])
 
     # Final test actually skips one layer of nesting
     assert and_introduction_rule.verify([a, b], ab)
@@ -130,7 +130,7 @@ def test_disjunction_then_case_analysis_with_deep_structure():
     sp1 = subproof("2", stmt("2.1", P), [stmt("2.2", Variable("X"))])
     sp2 = subproof("3", stmt("3.1", Q), [stmt("3.2", Variable("X"))])
     sp3 = subproof("4", stmt("4.1", R), [stmt("4.2", Variable("X"))])
-    conclusion = stmt("5", Variable("X"), "∨ Elimination", [sid("1"), sid("2"), sid("3"), sid("4")])
+    conclusion = stmt("5", Variable("X"), "Or Elimination", [sid("1"), sid("2"), sid("3"), sid("4")])
 
     assert or_elimination_rule.verify([disj_st, sp1, sp2, sp3], conclusion)
 
@@ -138,7 +138,7 @@ def test_double_negation_elimination_nested():
     A = Variable("A")
     nnA = Not(Not(A))
     support = stmt("1", nnA)
-    conclusion = stmt("2", A, "¬ Elimination", [sid("1")])
+    conclusion = stmt("2", A, "Not Elimination", [sid("1")])
 
     assert not_elimination_rule.verify([support], conclusion)
 
@@ -146,8 +146,8 @@ def test_double_negation_elimination_nested():
     assume_A = stmt("3.1", A)
     leads_to_bottom = stmt("3.2", Bottom())  # assume deriving contradiction
     sp = subproof("3", assume_A, [leads_to_bottom])
-    negated = stmt("4", Not(A), "¬ Introduction", [sid("3")])
-    reinverted = stmt("5", Not(Not(A)), "¬ Introduction", [sid("4")])
+    negated = stmt("4", Not(A), "Not Introduction", [sid("3")])
+    reinverted = stmt("5", Not(Not(A)), "Not Introduction", [sid("4")])
 
     # Not a perfect logic chain (we're not reconstructing the bottom here),
     # but a shape test that nested applications compose properly
@@ -159,7 +159,7 @@ def test_or_intro_then_elim_to_different_conclusion():
     disj = stmt("1", Or(A, B))
     sp1 = subproof("2", stmt("2.1", A), [stmt("2.2", C)])
     sp2 = subproof("3", stmt("3.1", B), [stmt("3.2", D)])
-    result = stmt("4", C, "∨ Elimination", [sid("1"), sid("2"), sid("3")])
+    result = stmt("4", C, "Or Elimination", [sid("1"), sid("2"), sid("3")])
 
     # Should fail: conclusion mismatch (C ≠ D)
     assert not or_elimination_rule.verify([disj, sp1, sp2], result)
@@ -168,10 +168,10 @@ def test_complex_biconditional_then_elim_and_chain():
     A, B = Variable("A"), Variable("B")
     bicond = stmt("1", Iff(A, B))
     a = stmt("2", A)
-    b = stmt("3", B, "↔ Elimination", [sid("1"), sid("2")])
+    b = stmt("3", B, "Biconditional Elimination", [sid("1"), sid("2")])
 
     impl = stmt("4", Implies(B, A))
-    result = stmt("5", A, "→ Elimination", [sid("4"), sid("3")])
+    result = stmt("5", A, "Implication Elimination", [sid("4"), sid("3")])
 
     assert biconditional_elimination_rule.verify([bicond, a], b)
     assert conditional_elimination_rule.verify([impl, b], result)

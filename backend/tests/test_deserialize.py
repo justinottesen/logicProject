@@ -48,7 +48,7 @@ def test_parse_subproof_with_bottom_intro():
                     {
                         "id": "2.2",
                         "formula": { "type": "bottom" },
-                        "rule": "⊥ Introduction",
+                        "rule": "Bottom Introduction",
                         "premises": ["1", "2.1"]
                     }
                 ]
@@ -63,7 +63,7 @@ def test_parse_subproof_with_bottom_intro():
                     "value": { "type": "var", "name": "P" }
                     }
                 },
-                "rule": "¬ Elimination",
+                "rule": "Not Elimination",
                 "premises": ["2"]
             }
         ],
@@ -123,7 +123,7 @@ def test_parse_and_formula():
                     "left": { "type": "var", "name": "P" },
                     "right": { "type": "var", "name": "Q" }
                 },
-                "rule": "∧ Introduction",
+                "rule": "And Introduction",
                 "premises": ["1", "2"]
             }
         ],

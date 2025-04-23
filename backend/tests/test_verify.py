@@ -52,7 +52,7 @@ def test_valid_and_intro():
     Q = Variable("Q")
     a = stmt("1", P, rule="Assumption")
     b = stmt("2", Q, rule="Assumption")
-    ab = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    ab = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
     proof = fake_proof(premises=[a, b], steps=[ab])
     rule_checker = RuleRegistry()
     assert verify_statement(ab, proof, rule_checker) is True
@@ -62,7 +62,7 @@ def test_invalid_and_intro_wrong_formula():
     Q = Variable("Q")
     a = stmt("1", P, rule="Assumption")
     b = stmt("2", Q, rule="Assumption")
-    wrong = stmt("3", Variable("X"), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    wrong = stmt("3", Variable("X"), rule="And Introduction", premises=[sid("1"), sid("2")])
     proof = fake_proof(premises=[a, b], steps=[wrong])
     rule_checker = RuleRegistry()
     result = verify_statement(wrong, proof, rule_checker)
@@ -71,7 +71,7 @@ def test_invalid_and_intro_wrong_formula():
 def test_invalid_missing_premise():
     P = Variable("P")
     a = stmt("1", P, rule="Assumption")
-    b = stmt("2", P, rule="∨ Introduction", premises=[sid("1"), sid("999")])  # 999 doesn't exist
+    b = stmt("2", P, rule="Or Introduction", premises=[sid("1"), sid("999")])  # 999 doesn't exist
     proof = fake_proof(premises=[a], steps=[b])
     rule_checker = RuleRegistry()
     result = verify_statement(b, proof, rule_checker)
@@ -79,7 +79,7 @@ def test_invalid_missing_premise():
 
 def test_valid_bottom_elimination():
     bottom = stmt("1", Bottom(), rule="Assumption")
-    result = stmt("2", Variable("X"), rule="⊥ Elimination", premises=[sid("1")])
+    result = stmt("2", Variable("X"), rule="Bottom Elimination", premises=[sid("1")])
     proof = fake_proof(premises=[bottom], steps=[result])
     rule_checker = RuleRegistry()
     assert verify_statement(result, proof, rule_checker) is True
@@ -128,7 +128,7 @@ def test_valid_full_proof_with_not_intro():
     assume_P = stmt("2.1", P, rule="Assumption")
 
     # Derive ⊥ from P and ¬P
-    contradiction = stmt("2.2", Bottom(), rule="⊥ Introduction", premises=[sid("1"), sid("2.1")])
+    contradiction = stmt("2.2", Bottom(), rule="Bottom Introduction", premises=[sid("1"), sid("2.1")])
     sp = subproof("2", assume_P, [contradiction])
 
     proof = Proof(
@@ -145,7 +145,7 @@ def test_invalid_proof_with_missing_premise():
     Q = Variable("Q")
 
     # Step 1 is missing
-    and_intro = stmt("2", Variable("R"), rule="∧ Introduction", premises=[sid("1"), sid("99")])
+    and_intro = stmt("2", Variable("R"), rule="And Introduction", premises=[sid("1"), sid("99")])
 
     proof = Proof(
         premises=[],
@@ -162,7 +162,7 @@ def test_invalid_proof_with_wrong_conclusion():
     P = Variable("P")
 
     s = stmt("1", P, rule="Assumption")
-    bad = stmt("2", Not(P), rule="¬ Introduction", premises=[sid("1")])
+    bad = stmt("2", Not(P), rule="Not Introduction", premises=[sid("1")])
 
     proof = Proof(
         premises=[s],
@@ -177,7 +177,7 @@ def test_invalid_proof_with_wrong_conclusion():
 
 def test_invalid_premise_rule():
     P = Variable("P")
-    bad_premise = stmt("1", P, rule="∨ Introduction")  # not Assumption
+    bad_premise = stmt("1", P, rule="Or Introduction")  # not Assumption
     proof = Proof(premises=[bad_premise], steps=[], conclusions=[])
     rule_checker = RuleRegistry()
     result = verify_proof(proof, rule_checker)
@@ -187,7 +187,7 @@ def test_invalid_conclusion_rule():
     P = Variable("P")
     good = stmt("1", P, rule="Assumption")
     derived = stmt("2", P, rule="Reiteration", premises=[sid("1")])
-    bad_conclusion = stmt("3", P, rule="∧ Introduction", premises=[sid("1"), sid("1")])
+    bad_conclusion = stmt("3", P, rule="And Introduction", premises=[sid("1"), sid("1")])
     proof = Proof(premises=[good], steps=[derived], conclusions=[bad_conclusion])
     rule_checker = RuleRegistry()
     result = verify_proof(proof, rule_checker)
@@ -195,8 +195,8 @@ def test_invalid_conclusion_rule():
 
 def test_invalid_subproof_assumption_rule():
     P = Variable("P")
-    assume = stmt("1.1", P, rule="¬ Introduction")  # not Assumption
-    step = stmt("1.2", Bottom(), rule="⊥ Introduction", premises=[sid("1.1"), sid("1.1")])
+    assume = stmt("1.1", P, rule="Not Introduction")  # not Assumption
+    step = stmt("1.2", Bottom(), rule="Bottom Introduction", premises=[sid("1.1"), sid("1.1")])
     sp = subproof("1", assume, [step])
     reiterate = stmt("2", Bottom(), rule="Reiteration", premises=[sid("1.2")])
     proof = Proof(premises=[], steps=[assume, step, sp, reiterate], conclusions=[reiterate])
@@ -210,7 +210,7 @@ def test_valid_conjunction_with_reiteration():
 
     a = stmt("1", P, rule="Assumption")
     b = stmt("2", Q, rule="Assumption")
-    conj = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    conj = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
     reiterate = stmt("4", And(P, Q), rule="Reiteration", premises=[sid("3")])
     proof = Proof(premises=[a, b], steps=[conj], conclusions=[reiterate])
     rule_checker = RuleRegistry()
@@ -223,7 +223,7 @@ def test_verify_proof_with_custom_rule_success():
     Q = Variable("Q")
     A = stmt("1", P, rule="Assumption")
     B = stmt("2", Q, rule="Assumption")
-    AB = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    AB = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
 
     # Define the custom rule proof
     custom_proof = Proof(premises=[A, B], steps=[AB], conclusions=[AB])
@@ -247,7 +247,7 @@ def test_verify_custom_rule_wrong_premises():
 
     A = stmt("1", P, rule="Assumption")
     B = stmt("2", Q, rule="Assumption")
-    AB = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    AB = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
     custom_proof = Proof(premises=[A, B], steps=[AB], conclusions=[AB])
 
     registry = RuleRegistry()
@@ -290,27 +290,27 @@ def test_verify_proof_with_excluded_middle_custom_rule():
 
     # Subproof 1.2: assume P
     assume_p = Statement(sid("1.2.1"), P, "Assumption")
-    or_intro_1 = Statement(sid("1.2.2"), disj, "∨ Introduction", [sid("1.2.1")])
-    bottom_1 = Statement(sid("1.2.3"), Bottom(), "⊥ Introduction", [sid("1.1"), sid("1.2.2")])
+    or_intro_1 = Statement(sid("1.2.2"), disj, "Or Introduction", [sid("1.2.1")])
+    bottom_1 = Statement(sid("1.2.3"), Bottom(), "Bottom Introduction", [sid("1.1"), sid("1.2.2")])
     subproof_1_2 = Subproof(sid("1.2"), assume_p, [or_intro_1, bottom_1])
 
-    # Step 1.3: ¬P by ¬ Introduction from subproof 1.2
-    not_p = Statement(sid("1.3"), Not(P), "¬ Introduction", [sid("1.2")])
+    # Step 1.3: ¬P by Not Introduction from subproof 1.2
+    not_p = Statement(sid("1.3"), Not(P), "Not Introduction", [sid("1.2")])
 
-    # Step 1.4: P ∨ ¬P by ∨ Introduction on ¬P
-    or_intro_2 = Statement(sid("1.4"), disj, "∨ Introduction", [sid("1.3")])
+    # Step 1.4: P ∨ ¬P by Or Introduction on ¬P
+    or_intro_2 = Statement(sid("1.4"), disj, "Or Introduction", [sid("1.3")])
 
     # Step 1.5: ⊥ from 1.1 and 1.4
-    bottom_2 = Statement(sid("1.5"), Bottom(), "⊥ Introduction", [sid("1.1"), sid("1.4")])
+    bottom_2 = Statement(sid("1.5"), Bottom(), "Bottom Introduction", [sid("1.1"), sid("1.4")])
 
     # Subproof 1
     subproof_1 = Subproof(sid("1"), not_disj, [subproof_1_2, not_p, or_intro_2, bottom_2])
 
-    # Step 2: ¬¬(P ∨ ¬P) by ¬ Introduction from 1
-    not_not_disj = Statement(sid("2"), Not(Not(disj)), "¬ Introduction", [sid("1")])
+    # Step 2: ¬¬(P ∨ ¬P) by Not Introduction from 1
+    not_not_disj = Statement(sid("2"), Not(Not(disj)), "Not Introduction", [sid("1")])
 
-    # Step 3: P ∨ ¬P by ¬ Elimination on 2
-    conclusion_step = Statement(sid("3"), disj, "¬ Elimination", [sid("2")])
+    # Step 3: P ∨ ¬P by Not Elimination on 2
+    conclusion_step = Statement(sid("3"), disj, "Not Elimination", [sid("2")])
 
     # Step 4: reiterate 3
     reiteration = Statement(sid("4"), disj, "Reiteration", [sid("3")])
@@ -327,7 +327,7 @@ def test_verify_proof_with_excluded_middle_custom_rule():
     # Construct a user proof using this custom rule
     implication = stmt("1", Implies(Or(P, Not(P)), Q), rule="Assumption")
     use_em = stmt("2", Or(P, Not(P)), rule="ExcludedMiddle", premises=[])
-    apply_impl = stmt("3", Q, rule="→ Elimination", premises=[sid("1"), sid("2")])
+    apply_impl = stmt("3", Q, rule="Implication Elimination", premises=[sid("1"), sid("2")])
     final = stmt("4", Q, rule="Reiteration", premises=[sid("3")])
 
     user_proof = Proof(

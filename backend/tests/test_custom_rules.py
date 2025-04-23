@@ -34,7 +34,7 @@ def test_custom_rule_and_intro_success():
     Q = Variable("Q")
     A = stmt("1", P, rule="Assumption")
     B = stmt("2", Q, rule="Assumption")
-    AB = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    AB = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
 
     proof = Proof(premises=[A, B], steps=[AB], conclusions=[AB])
     rule = CustomRule("Test ∧ Intro", proof)
@@ -48,7 +48,7 @@ def test_custom_rule_wrong_premise_formula():
     R = Variable("R")
     A = stmt("1", P, rule="Assumption")
     B = stmt("2", Q, rule="Assumption")
-    AB = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    AB = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
 
     proof = Proof(premises=[A, B], steps=[AB], conclusions=[AB])
     rule = CustomRule("Test ∧ Intro", proof)
@@ -62,7 +62,7 @@ def test_custom_rule_wrong_conclusion_formula():
     Q = Variable("Q")
     A = stmt("1", P, rule="Assumption")
     B = stmt("2", Q, rule="Assumption")
-    AB = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    AB = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
     Wrong = stmt("4", P, rule="Reiteration", premises=[sid("1")])
 
     proof = Proof(premises=[A, B], steps=[AB], conclusions=[AB])
@@ -79,7 +79,7 @@ def test_save_and_load_custom_rule(temp_rule_dir):
 
     a = Statement(sid("1"), P, "Assumption")
     b = Statement(sid("2"), Q, "Assumption")
-    ab = Statement(sid("3"), And(P, Q), "∧ Introduction", [sid("1"), sid("2")])
+    ab = Statement(sid("3"), And(P, Q), "And Introduction", [sid("1"), sid("2")])
     reiterate = Statement(sid("4"), And(P, Q), "Reiteration", [sid("3")])
 
     proof = Proof(premises=[a, b], steps=[ab], conclusions=[reiterate])
@@ -121,7 +121,7 @@ def test_loaded_rule_used_in_verification(temp_rule_dir):
 
     a = Statement(sid("1"), P, "Assumption")
     b = Statement(sid("2"), Q, "Assumption")
-    ab = Statement(sid("3"), And(P, Q), "∧ Introduction", [sid("1"), sid("2")])
+    ab = Statement(sid("3"), And(P, Q), "And Introduction", [sid("1"), sid("2")])
     reiterate = Statement(sid("4"), And(P, Q), "Reiteration", [sid("3")])
 
     rule_proof = Proof(premises=[a, b], steps=[ab], conclusions=[reiterate])
