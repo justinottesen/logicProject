@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ProofEditor from "./components/ProofEditor";
 import { Proof } from "./lib/logic/proof";
 import { number } from "./lib/logic/numberSteps";
+import { convert } from "./lib/convert";
 
 export default function Home() {
   const [proof, setProof] = useState<Proof>({
@@ -19,10 +20,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (proof.steps.length === 0) return;
-    if (proof.steps[0].type !== "line") return;
-    console.log(proof.steps[0].result.status);
-
+    const converted = convert(proof);
+    console.log("Converted proof:", converted);
   }, [proof]);
 
   return (

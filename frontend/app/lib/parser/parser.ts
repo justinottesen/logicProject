@@ -38,7 +38,6 @@ export class Parser {
   }
 
   public expectEOF(): void {
-    console.table(this.tokens);
     if (this.current().type !== "eof") {
       throw new Error("Unexpected input after formula");
     }
@@ -49,7 +48,6 @@ export class Parser {
 
 
   public parseFormula(): Formula {
-    console.table(this.tokens);
     return this.parseIff();
   }
 

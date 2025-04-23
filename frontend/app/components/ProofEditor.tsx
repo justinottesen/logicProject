@@ -32,7 +32,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       result: parseFormulaInput(raw),
       rule: "none",
       number: index + 1,
-      parent: 0,
+      parent: newGoals[index].parent,
     };
     setProof({ ...proof, goals: newGoals });
   };
@@ -74,6 +74,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       result: parseFormulaInput(""),
       rule: "none",
       number: 0,
+      parent: 0,
     } as Goal;
     setProof(
       {
@@ -230,8 +231,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
                 placeholder={`Goal ${i + 1}`}
               />
               <input
-                type="number"
-                value={g.parent}
+                type="text"
+                value={(isNaN(g.parent) || g.parent <= 0) ? "" : g.parent}
                 onChange={(e) => updateGoalParent(i, e.target.value)}
                 className="border px-2 py-1 flex-grow-1 rounded w-full"
                 placeholder={`Parent ${i + 1}`}
