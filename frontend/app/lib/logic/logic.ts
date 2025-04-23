@@ -67,7 +67,13 @@ export type NotEquals = {
 
 export type BinaryConnective = And | Or | Implies | Iff;
 
+export type Bottom = {
+  type: "bottom";
+  value: '⊥';
+};
+
 export type Formula =
   | Predicate
   | Not
-  | BinaryConnective;
+  | BinaryConnective
+  | Bottom;

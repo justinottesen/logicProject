@@ -46,6 +46,11 @@ type ConvertedFormula = {
     type: Types,
     left: ConvertedFormula,
     right: ConvertedFormula
+} | {
+    type: "not",
+    value: ConvertedFormula
+} | {
+    type: "bottom"
 }
 
 type Types = "and" | "or" | "not" | "implies" | "iff";
@@ -107,8 +112,7 @@ const convertFormula = (formula: Formula): ConvertedFormula => {
         case "not":
             return {
                 type: "not",
-                left: convertFormula(formula.operand),
-                right: convertFormula(formula.operand)
+                value: convertFormula(formula.operand)
             }
         case "and":
             return {
@@ -134,6 +138,10 @@ const convertFormula = (formula: Formula): ConvertedFormula => {
                 left: convertFormula(formula.left),
                 right: convertFormula(formula.right)
             }
+        case "bottom":
+            return {
+                type: "bottom"
+            }
         default:
             throw new Error("Unknown formula type");
     }
@@ -158,7 +166,6 @@ const convertStep = (step: Step): ConvertedStep => {
         return convertedStep;
 
     } else if (step.type === "line") {
-        console.table(step.parents)
         const convertedStep: ConvertedStatement = {
             id: step.number + "",
             formula: emptyConvertedFormula,
@@ -172,7 +179,7 @@ const convertStep = (step: Step): ConvertedStep => {
         throw new Error("Unknown step type");
     }
 }
-const convertRule = (rule: ShortRules | "none"):    LongRules => {
+const convertRule = (rule: ShortRules | "none"): LongRules => {
     if (rule === "none") throw new Error("Rule is none");
     return longRuleObjects[rule] as LongRules;
 }

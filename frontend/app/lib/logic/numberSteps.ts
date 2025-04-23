@@ -2,7 +2,6 @@ import { Proof, Subproof } from "./proof";
 
 
 export const number = (proof: Proof) => {
-    console.log("proof");
     let i = 1;
 
     for (const premise of proof.premises) {

@@ -37,6 +37,7 @@ export class Parser {
     }
   }
 
+
   public expectEOF(): void {
     if (this.current().type !== "eof") {
       throw new Error("Unexpected input after formula");
@@ -99,7 +100,6 @@ export class Parser {
 
   private parsePrimary(): Formula {
     const token = this.current();
-
     if (token.type === "symbol" && token.value === "(") {
       this.advance();
       const inner = this.parseFormula();
@@ -109,6 +109,11 @@ export class Parser {
 
     if (token.type === "identifier") {
       return this.parsePredicate();
+    }
+
+    if (token.type === "bottom") {
+      this.advance();
+      return { type: "bottom", value: "⊥" };
     }
 
     if (token.type === "eof") {

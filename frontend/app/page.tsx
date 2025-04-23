@@ -16,6 +16,8 @@ export default function Home() {
     goals: [],
   });
 
+  const [valid, setValid] = useState<boolean>(false);
+
   const changeProof = (newProof: Proof, changeNumber?: boolean) => {
     if (changeNumber) number(newProof);
     setProof(newProof);
@@ -26,6 +28,7 @@ export default function Home() {
     try {
       converted = convert(proof);
     } catch (error) {
+      setValid(false);
       console.log("Error converting proof:", getErrorMessage(error));
     }
     try {
@@ -33,20 +36,33 @@ export default function Home() {
       console.log(JSON.stringify(converted));
       const verify = await verifyProof(converted);
       console.log(verify);
+      setValid(verify.valid);
     } catch (error) {
+      setValid(false);
       console.log("Error verifying proof:", getErrorMessage(error));
     }
   }
 
   useEffect(() => {
-    console.log(proof)
     verify();
   }, [proof]);
 
   return (
     <div className="flex flex-col w-full min-h-screen">
       <section className="flex-1 border p-4 overflow-auto">
-        <h2 className="text-xl font-bold mb-4">Proof</h2>
+        <div className="grid grid-cols-2">
+          <h2 className="text-xl font-bold mb-4">Proof</h2>
+          {valid && (
+            <div className="bg-green-500 text-white text-xl font-bold mr-2 px-2 py-1 rounded">
+              Valid
+            </div>
+          )}
+          {!valid && (
+            <div className="bg-red-500 text-white text-xl font-bold mr-2 px-2 py-1 rounded">
+              Invalid
+            </div>
+          )}
+        </div>
         <ProofEditor proof={proof} setProof={changeProof} />
       </section>
     </div>

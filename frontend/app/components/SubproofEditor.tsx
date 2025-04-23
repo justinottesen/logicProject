@@ -6,6 +6,7 @@ import StepEditor from "./StepEditor";
 import StatementEditor from "./StatementEditor";
 import { text } from "stream/consumers";
 import { Constant } from "@/lib/logic/logic";
+import { replaceSubstitutions } from "@/lib/logic/substitutions";
 
 type SubproofEditorProps = {
   subproof: Subproof;
@@ -76,7 +77,7 @@ export default function SubproofEditor({
   const onChangePremise = (text: string) => {
     const updatedPremise = {
       ...subproof.premise,
-      raw: text,
+      raw: replaceSubstitutions(text),
       result: parseFormulaInput(text),
     };
     onChange({ ...subproof, premise: updatedPremise });
