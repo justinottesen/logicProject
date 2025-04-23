@@ -1,0 +1,197 @@
+{
+  "premises": [],
+  "steps": [
+    {
+      "id": "1",
+      "type": "subproof",
+      "assumption": {
+        "id": "1.1",
+        "formula": {
+          "type": "not",
+          "value": {
+            "type": "or",
+            "left": {
+              "type": "var",
+              "name": "P"
+            },
+            "right": {
+              "type": "not",
+              "value": {
+                "type": "var",
+                "name": "P"
+              }
+            }
+          }
+        },
+        "rule": "Assumption",
+        "premises": []
+      },
+      "steps": [
+        {
+          "id": "1.2",
+          "type": "subproof",
+          "assumption": {
+            "id": "1.2.1",
+            "formula": {
+              "type": "var",
+              "name": "P"
+            },
+            "rule": "Assumption",
+            "premises": []
+          },
+          "steps": [
+            {
+              "id": "1.2.2",
+              "formula": {
+                "type": "or",
+                "left": {
+                  "type": "var",
+                  "name": "P"
+                },
+                "right": {
+                  "type": "not",
+                  "value": {
+                    "type": "var",
+                    "name": "P"
+                  }
+                }
+              },
+              "rule": "∨ Introduction",
+              "premises": [
+                "1.2.1"
+              ]
+            },
+            {
+              "id": "1.2.3",
+              "formula": {
+                "type": "bottom"
+              },
+              "rule": "⊥ Introduction",
+              "premises": [
+                "1.1",
+                "1.2.2"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "1.3",
+          "formula": {
+            "type": "not",
+            "value": {
+              "type": "var",
+              "name": "P"
+            }
+          },
+          "rule": "¬ Introduction",
+          "premises": [
+            "1.2"
+          ]
+        },
+        {
+          "id": "1.4",
+          "formula": {
+            "type": "or",
+            "left": {
+              "type": "var",
+              "name": "P"
+            },
+            "right": {
+              "type": "not",
+              "value": {
+                "type": "var",
+                "name": "P"
+              }
+            }
+          },
+          "rule": "∨ Introduction",
+          "premises": [
+            "1.3"
+          ]
+        },
+        {
+          "id": "1.5",
+          "formula": {
+            "type": "bottom"
+          },
+          "rule": "⊥ Introduction",
+          "premises": [
+            "1.1",
+            "1.4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "formula": {
+        "type": "not",
+        "value": {
+          "type": "not",
+          "value": {
+            "type": "or",
+            "left": {
+              "type": "var",
+              "name": "P"
+            },
+            "right": {
+              "type": "not",
+              "value": {
+                "type": "var",
+                "name": "P"
+              }
+            }
+          }
+        }
+      },
+      "rule": "¬ Introduction",
+      "premises": [
+        "1"
+      ]
+    },
+    {
+      "id": "3",
+      "formula": {
+        "type": "or",
+        "left": {
+          "type": "var",
+          "name": "P"
+        },
+        "right": {
+          "type": "not",
+          "value": {
+            "type": "var",
+            "name": "P"
+          }
+        }
+      },
+      "rule": "¬ Elimination",
+      "premises": [
+        "2"
+      ]
+    }
+  ],
+  "conclusions": [
+    {
+      "id": "4",
+      "formula": {
+        "type": "or",
+        "left": {
+          "type": "var",
+          "name": "P"
+        },
+        "right": {
+          "type": "not",
+          "value": {
+            "type": "var",
+            "name": "P"
+          }
+        }
+      },
+      "rule": "Reiteration",
+      "premises": [
+        "3"
+      ]
+    }
+  ]
+}
