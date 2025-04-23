@@ -20,9 +20,7 @@ The roadmap of goals for the project are below. Depending on time constraints, a
 
 ### Current Status
 
-Web-App Support: Step 1
-
-CLI Support: Step 2
+Full backend support for steps 1 through 3, working on connecting the front end to the backend.
 
 ## Setup Instructions
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). The backend is a python module, managed by the `pyproject.toml` file.
