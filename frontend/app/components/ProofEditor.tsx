@@ -16,8 +16,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
     const newPremises = [...proof.premises];
     newPremises[index] = {
       type: "premise",
-      raw,
-      result: parseFormulaInput(raw),
+      raw: replaceSubstitutions(raw),
+      result: parseFormulaInput(replaceSubstitutions(raw)),
       rule: "none",
       number: index + 1,
     };
@@ -28,8 +28,8 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
     const newGoals = [...proof.goals];
     newGoals[index] = {
       type: "goal",
-      raw,
-      result: parseFormulaInput(raw),
+      raw: replaceSubstitutions(raw),
+      result: parseFormulaInput(replaceSubstitutions(raw)),
       rule: "none",
       number: index + 1,
       parent: newGoals[index].parent,

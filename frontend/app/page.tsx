@@ -5,6 +5,8 @@ import ProofEditor from "./components/ProofEditor";
 import { Proof } from "./lib/logic/proof";
 import { number } from "./lib/logic/numberSteps";
 import { convert } from "./lib/convert";
+import { verifyProof } from "./lib/api";
+import { getErrorMessage } from "./lib/parser";
 
 export default function Home() {
   const [proof, setProof] = useState<Proof>({
@@ -19,9 +21,19 @@ export default function Home() {
     setProof(newProof);
   };
 
+  async function verify() {
+    try {
+      const converted = convert(proof);
+      console.log("Converted proof:", converted);
+      const verify = await verifyProof(converted);
+      // console.log(verify);
+    } catch (error) {
+      console.log("Error verifying proof:", getErrorMessage(error));
+    }
+  }
+
   useEffect(() => {
-    const converted = convert(proof);
-    console.log("Converted proof:", converted);
+    verify();
   }, [proof]);
 
   return (

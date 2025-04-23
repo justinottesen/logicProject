@@ -88,7 +88,7 @@ export const convert = (proof: Proof) => {
         i++;
     }
     number(converted);
-    return JSON.stringify(converted, null, 2);
+    return converted;
 }
 
 
@@ -96,7 +96,7 @@ export const convert = (proof: Proof) => {
 
 
 const convertToFormula = (formula: ParsedFormula): ConvertedFormula => {
-    if (formula.status !== "ok") return emptyConvertedFormula;
+    if (formula.status !== "ok") throw new Error("Formula is not ok");
     return convertFormula(formula.formula);
 
 }
