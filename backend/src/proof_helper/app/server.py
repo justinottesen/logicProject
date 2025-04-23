@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
 from proof_helper.logic.rule_registry import RuleRegistry
 from proof_helper.io.deserialize import build_proof
-from proof_helper.io.serialize import dump_proof
+from proof_helper.io.serialize import dump_proof, dump_formula
 from proof_helper.logic.verify import verify_proof, VerificationError
+from proof_helper.logic.step_suggestions import generate_next_steps
 from proof_helper.io.rule_storage import CustomRuleStore
 from typing import Optional
 import argparse
 import traceback
+import json
 
 class ProofApp(Flask):
     def __init__(self, import_name: str, rules_dir: Optional[str] = None):
@@ -18,7 +20,7 @@ def register_routes(app: ProofApp):
     @app.route('/verify_proof', methods=['POST'])
     def verify_proof_api():
         try:
-            data = request.get_json()
+            data = json.loads(request.data.decode())
             proof = build_proof(data)
             rule_checker = app.rule_registry
 
@@ -43,7 +45,7 @@ def register_routes(app: ProofApp):
     @app.route('/rules', methods=['POST'])
     def add_custom_rule_api():
         try:
-            data = request.get_json()
+            data = json.loads(request.data.decode())
             name = data.get("name")
             raw_proof = data.get("proof")
             proof = build_proof(raw_proof)
@@ -86,6 +88,41 @@ def register_routes(app: ProofApp):
                 "error": str(e),
                 "trace": traceback.format_exc()
             }), 500
+        
+    @app.route('/suggest_rules', methods=['POST'])
+    def suggest_rules_api():
+        try:
+            data = json.loads(request.data.decode())
+            raw_proof = data.get("proof")
+            max_suggestions = data.get("max", 5)
+
+            if not isinstance(max_suggestions, int) or max_suggestions <= 0:
+                return jsonify({
+                    "step_id": None,
+                    "message": "'max' must be a positive integer"
+                }), 400
+
+            proof = build_proof(raw_proof)
+            registry = app.rule_registry
+            suggestions = generate_next_steps(proof, registry)
+
+            # Build response: only include top N
+            top = sorted(suggestions, key=lambda s: -s[1])[:max_suggestions]
+            formatted = [{
+                "formula": dump_formula(s.formula),
+                "rule": s.rule,
+                "premises": [str(p) for p in s.premises],
+                "score": score
+            } for s, score in top]
+
+            return jsonify(formatted)
+
+        except Exception as e:
+            return jsonify({
+                "step_id": None,
+                "message": str(e),
+                "trace": traceback.format_exc()
+            }), 400
 
 
 def main():

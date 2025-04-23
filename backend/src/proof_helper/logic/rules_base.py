@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 from proof_helper.core.proof import Step, Statement
+from proof_helper.core.formula import Formula
 
 class Rule(ABC):
     @abstractmethod
@@ -21,3 +22,8 @@ class Rule(ABC):
     def verify(self, supports: list[Step], conclusion: Statement) -> bool:
         """Return True if the conclusion follows from supports via this rule."""
         pass
+
+    @abstractmethod
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        """Return a list of formulas that can be concluded from a rule application"""
+        return []

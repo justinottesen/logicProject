@@ -20,6 +20,9 @@ def f_var(name):
 def f_and(a, b):
     return { "type": "and", "left": a, "right": b }
 
+def f_or(left, right):
+    return { "type": "or", "left": left, "right": right }
+
 def test_valid_proof_returns_200(client):
     payload = {
         "premises": [
@@ -256,3 +259,54 @@ def test_get_rules_returns_builtin_and_custom(client):
     assert "custom" in data
     assert "TestConjunction" in data["custom"]
     assert "∧ Introduction" in data["builtin"]
+
+def test_suggest_rules_basic(client):
+    payload = {
+        "proof": {
+            "premises": [
+                {"id": "1", "formula": f_var("P"), "rule": "Assumption"},
+                {"id": "2", "formula": f_var("Q"), "rule": "Assumption"}
+            ],
+            "steps": [],
+            "conclusions": [
+                {"id": "3", "formula": f_and(f_var("P"), f_var("Q")), "rule": "Reiteration", "premises": ["4"]}
+            ]
+        },
+        "max": 5
+    }
+
+    response = client.post("/suggest_rules", json=payload)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert any(item["rule"] == "∧ Introduction" for item in data)
+    assert all("formula" in item and "rule" in item and "score" in item for item in data)
+
+def test_suggest_rules_with_custom_max(client):
+    payload = {
+        "proof": {
+            "premises": [{"id": "1", "formula": f_var("P"), "rule": "Assumption"}],
+            "steps": [],
+            "conclusions": [{"id": "2", "formula": f_or(f_var("P"), f_var("Q")), "rule": "Reiteration", "premises": ["3"]}]
+        },
+        "max": 1
+    }
+    response = client.post("/suggest_rules", json=payload)
+    assert response.status_code == 200
+    assert len(response.get_json()) <= 1
+
+def test_suggest_rules_invalid_max(client):
+    payload = {
+        "proof": {
+            "premises": [],
+            "steps": [],
+            "conclusions": []
+        },
+        "max": "not_a_number"
+    }
+    response = client.post("/suggest_rules", json=payload)
+    assert response.status_code == 400
+
+def test_suggest_rules_malformed_json(client):
+    response = client.post("/suggest_rules", data="not json")
+    assert response.status_code == 400

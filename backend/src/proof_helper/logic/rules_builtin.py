@@ -1,7 +1,7 @@
 from functools import wraps
 from typing import Callable, Dict, List, Set, Optional
 from proof_helper.core.proof import Step, Statement, Subproof, Proof
-from proof_helper.core.formula import Formula, And, Or, Not, Bottom, Implies, Iff
+from proof_helper.core.formula import Formula, And, Or, Not, Bottom, Implies, Iff, Variable
 from proof_helper.logic.rules_custom import CustomRule
 from proof_helper.logic.rules_base import Rule
 
@@ -17,6 +17,9 @@ class AssumptionRule(Rule):
     
     def verify(self, supports: List[Step], statement: Statement) -> bool:
         return self.is_applicable(supports)
+    
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        return []
         
 class ReiterationRule(Rule):
     def name(self) -> str:
@@ -33,6 +36,11 @@ class ReiterationRule(Rule):
             return False
         support = supports[0]
         return support.formula == statement.formula
+    
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        return [ s.formula for s in supports ]
 
 
 class AndIntroductionRule(Rule):
@@ -63,6 +71,20 @@ class AndIntroductionRule(Rule):
 
         return statement_conjuncts == support_conjuncts
 
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        
+        # Generate a single top-level conjunction, nesting left-to-right
+        formulas = [s.formula for s in supports]
+        if not formulas:
+            return []
+
+        result = formulas[0]
+        for f in formulas[1:]:
+            result = And(result, f)
+        return [result]
+
 class OrIntroductionRule(Rule):
     def name(self) -> str:
         return "∨ Introduction"
@@ -84,6 +106,40 @@ class OrIntroductionRule(Rule):
 
         disjuncts = collect_disjuncts(statement.formula)
         return supports[0].formula in disjuncts
+    
+    def conclude(self, supports: list[Step], goals: Optional[list[Formula]] = None) -> list[Formula]:
+        if not self.is_applicable(supports):
+            return []
+
+        if not supports:
+            return []
+
+        support_formula = supports[0].formula
+
+        # If no goals provided, default to generic disjunction
+        if goals is None:
+            return [Or(support_formula, support_formula)]
+
+        suggested = []
+        for goal in goals:
+            def collect_disjuncts(f: Formula) -> list[Formula]:
+                if isinstance(f, Or):
+                    return collect_disjuncts(f.left) + collect_disjuncts(f.right)
+                return [f]
+
+            disjuncts = collect_disjuncts(goal)
+
+            # If the support formula is already part of a disjunction, suggest the whole goal
+            if support_formula in disjuncts:
+                suggested.append(goal)
+            else:
+                # Suggest new Or with each disjunct in the goal
+                suggested.extend([
+                    Or(support_formula, d) for d in disjuncts if d != support_formula
+                ])
+
+        return suggested
+
 class NotIntroductionRule(Rule):
     def name(self) -> str:
         return "¬ Introduction"
@@ -114,6 +170,13 @@ class NotIntroductionRule(Rule):
 
         return False
     
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        
+        support = supports[0]
+        return [Not(support.assumption.formula)]
+    
 class BottomIntroductionRule(Rule):
     def name(self) -> str:
         return "⊥ Introduction"
@@ -137,6 +200,11 @@ class BottomIntroductionRule(Rule):
         )
 
         return formulas_match and isinstance(statement.formula, Bottom)
+    
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        return [Bottom()]
 
 class ConditionalIntroductionRule(Rule):
     def name(self) -> str:
@@ -163,6 +231,13 @@ class ConditionalIntroductionRule(Rule):
             return False
 
         return statement.formula == Implies(assumption, last_step.formula)
+    
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        print(supports)
+        if not self.is_applicable(supports):
+            return []
+        sp = supports[0]
+        return [Implies(sp.assumption.formula, sp.steps[-1].formula)]
 
 class BiconditionalIntroductionRule(Rule):
     def name(self) -> str:
@@ -192,6 +267,22 @@ class BiconditionalIntroductionRule(Rule):
         expected2 = Iff(b_conclude, b_assume)
 
         return statement.formula == expected1 or statement.formula == expected2
+    
+    def conclude(self, supports: List[Step]) -> List[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        
+        a, b = supports
+        a_assume, a_conclude = a.assumption.formula, a.steps[-1].formula
+        b_assume, b_conclude = b.assumption.formula, b.steps[-1].formula
+
+        if a_assume == b_conclude and a_conclude == b_assume:
+            return [Iff(a_assume, a_conclude)]
+        elif a_assume == a_assume and a_conclude == b_conclude and b_assume == b_assume:
+            return [Iff(a_assume, a_conclude)]
+        else:
+            return []
+
 class AndEliminationRule(Rule):
     def name(self) -> str:
         return "∧ Elimination"
@@ -218,6 +309,18 @@ class AndEliminationRule(Rule):
         support_conjuncts = collect_conjuncts(supports[0].formula)
         stmt_conjuncts = collect_conjuncts(statement.formula)
         return stmt_conjuncts <= support_conjuncts
+    
+    def conclude(self, supports: List[Step]) -> List[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        formula = supports[0].formula
+        def collect(f: Formula) -> List[Formula]:
+            if isinstance(f, And):
+                return collect(f.left) + collect(f.right)
+            return [f]
+
+        return collect(formula)
+
 
 class OrEliminationRule(Rule):
     def name(self) -> str:
@@ -270,6 +373,19 @@ class OrEliminationRule(Rule):
             matched.add(assumption)
 
         return conclusion == statement.formula and len(matched) == len(disjuncts)
+    
+    def conclude(self, supports: List[Step]) -> List[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        
+        disj = supports[0]
+        subproofs = supports[1:]
+
+        conclusions = [sp.steps[-1].formula for sp in subproofs]
+        if all(c == conclusions[0] for c in conclusions):
+            return [conclusions[0]]
+        return []
+
 
 class NotEliminationRule(Rule):
     def name(self) -> str:
@@ -290,6 +406,15 @@ class NotEliminationRule(Rule):
         if not self.is_applicable(supports):
             return False
         return supports[0].formula.value.value == statement.formula
+    
+    def conclude(self, supports: List[Step]) -> List[Formula]:
+        if len(supports) != 1 or not isinstance(supports[0], Statement):
+            return []
+        formula = supports[0].formula
+        if isinstance(formula, Not) and isinstance(formula.value, Not):
+            return [formula.value.value]
+        return []
+
 
 class BottomEliminationRule(Rule):
     def name(self) -> str:
@@ -307,6 +432,12 @@ class BottomEliminationRule(Rule):
 
     def verify(self, supports: list[Step], statement: Statement) -> bool:
         return self.is_applicable(supports)
+    
+    from proof_helper.core.formula import Bottom
+
+    def conclude(self, supports: List[Step]) -> List[Formula]:
+        return [] # This is used for generation, and anything can be concluded
+
 
 class ConditionalEliminationRule(Rule):
     def name(self) -> str:
@@ -335,6 +466,23 @@ class ConditionalEliminationRule(Rule):
             return statement.formula == b.formula.right
 
         return False
+    
+    def conclude(self, supports: List[Step]) -> List[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        
+        if len(supports) != 2:
+            return []
+        a, b = supports
+        if not isinstance(a, Statement) or not isinstance(b, Statement):
+            return []
+
+        if isinstance(a.formula, Implies) and a.formula.left == b.formula:
+            return [a.formula.right]
+        if isinstance(b.formula, Implies) and b.formula.left == a.formula:
+            return [b.formula.right]
+        return []
+
 
 
 class BiconditionalEliminationRule(Rule):
@@ -371,6 +519,29 @@ class BiconditionalEliminationRule(Rule):
                 return statement.formula == b.formula.left
 
         return False
+
+    def conclude(self, supports: List[Step]) -> List[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        
+        if len(supports) != 2:
+            return []
+        a, b = supports
+        if not isinstance(a, Statement) or not isinstance(b, Statement):
+            return []
+
+        if isinstance(a.formula, Iff):
+            if a.formula.left == b.formula:
+                return [a.formula.right]
+            if a.formula.right == b.formula:
+                return [a.formula.left]
+        if isinstance(b.formula, Iff):
+            if b.formula.left == a.formula:
+                return [b.formula.right]
+            if b.formula.right == a.formula:
+                return [b.formula.left]
+        return []
+
 
 BUILTIN_RULES: list[Rule] = [
     AssumptionRule(),

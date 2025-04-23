@@ -32,3 +32,8 @@ class CustomRule(Rule):
             return False
 
         return any(statement.formula == c.formula for c in self.conclusions)
+    
+    def conclude(self, supports: list[Step]) -> list[Formula]:
+        if not self.is_applicable(supports):
+            return []
+        return [c.formula for c in self.conclusions]

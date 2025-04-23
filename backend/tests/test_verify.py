@@ -1,5 +1,5 @@
 import pytest
-from proof_helper.core.formula import Variable, And, Or, Bottom, Not
+from proof_helper.core.formula import Variable, And, Or, Bottom, Not, Implies
 from proof_helper.core.proof import Proof, StepID, Statement, Subproof, Step
 from proof_helper.logic.rule_registry import RuleRegistry
 from proof_helper.logic.verify import VerificationError, verify_statement, verify_subproof, verify_step, verify_proof
@@ -29,7 +29,7 @@ def test_assumption_is_always_valid():
     s = stmt("1", P, rule="Assumption")
     proof = fake_proof(premises=[s])
     rule_checker = RuleRegistry()
-    assert verify_statement(s, proof, rule_checker)
+    assert verify_statement(s, proof, rule_checker) is True
 
 def test_invalid_rule_returns_false():
     P = Variable("P")
@@ -55,7 +55,7 @@ def test_valid_and_intro():
     ab = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
     proof = fake_proof(premises=[a, b], steps=[ab])
     rule_checker = RuleRegistry()
-    assert verify_statement(ab, proof, rule_checker)
+    assert verify_statement(ab, proof, rule_checker) is True
 
 def test_invalid_and_intro_wrong_formula():
     P = Variable("P")
@@ -82,7 +82,7 @@ def test_valid_bottom_elimination():
     result = stmt("2", Variable("X"), rule="⊥ Elimination", premises=[sid("1")])
     proof = fake_proof(premises=[bottom], steps=[result])
     rule_checker = RuleRegistry()
-    assert verify_statement(result, proof, rule_checker)
+    assert verify_statement(result, proof, rule_checker) is True
 
 # === VERIFY SUBPROOF ===
 
@@ -114,7 +114,7 @@ def test_empty_subproof_is_valid_if_assumption_is_valid():
     sp = subproof("1", assume, steps=[])
     proof = fake_proof()
     rule_checker = RuleRegistry()
-    assert verify_subproof(sp, proof, rule_checker)
+    assert verify_subproof(sp, proof, rule_checker) is True
 
 # === VERIFY PROOF ===
 
@@ -278,3 +278,62 @@ def test_verify_custom_rule_unknown_name():
     result = verify_proof(proof, registry)
     assert isinstance(result, VerificationError)
     assert result.step_id == "3"
+
+def test_verify_proof_with_excluded_middle_custom_rule():
+    P = Variable("P")
+    Q = Variable("Q")
+
+    disj = Or(P, Not(P))
+
+    # Step 1.1: ¬(P ∨ ¬P)
+    not_disj = Statement(sid("1.1"), Not(disj), "Assumption")
+
+    # Subproof 1.2: assume P
+    assume_p = Statement(sid("1.2.1"), P, "Assumption")
+    or_intro_1 = Statement(sid("1.2.2"), disj, "∨ Introduction", [sid("1.2.1")])
+    bottom_1 = Statement(sid("1.2.3"), Bottom(), "⊥ Introduction", [sid("1.1"), sid("1.2.2")])
+    subproof_1_2 = Subproof(sid("1.2"), assume_p, [or_intro_1, bottom_1])
+
+    # Step 1.3: ¬P by ¬ Introduction from subproof 1.2
+    not_p = Statement(sid("1.3"), Not(P), "¬ Introduction", [sid("1.2")])
+
+    # Step 1.4: P ∨ ¬P by ∨ Introduction on ¬P
+    or_intro_2 = Statement(sid("1.4"), disj, "∨ Introduction", [sid("1.3")])
+
+    # Step 1.5: ⊥ from 1.1 and 1.4
+    bottom_2 = Statement(sid("1.5"), Bottom(), "⊥ Introduction", [sid("1.1"), sid("1.4")])
+
+    # Subproof 1
+    subproof_1 = Subproof(sid("1"), not_disj, [subproof_1_2, not_p, or_intro_2, bottom_2])
+
+    # Step 2: ¬¬(P ∨ ¬P) by ¬ Introduction from 1
+    not_not_disj = Statement(sid("2"), Not(Not(disj)), "¬ Introduction", [sid("1")])
+
+    # Step 3: P ∨ ¬P by ¬ Elimination on 2
+    conclusion_step = Statement(sid("3"), disj, "¬ Elimination", [sid("2")])
+
+    # Step 4: reiterate 3
+    reiteration = Statement(sid("4"), disj, "Reiteration", [sid("3")])
+
+    excluded_middle = Proof(
+        premises=[],
+        steps=[subproof_1, not_not_disj, conclusion_step],
+        conclusions=[reiteration]
+    )
+    registry = RuleRegistry()
+    assert verify_proof(excluded_middle, registry) is True
+    registry.add_custom_rule("ExcludedMiddle", excluded_middle)
+
+    # Construct a user proof using this custom rule
+    implication = stmt("1", Implies(Or(P, Not(P)), Q), rule="Assumption")
+    use_em = stmt("2", Or(P, Not(P)), rule="ExcludedMiddle", premises=[])
+    apply_impl = stmt("3", Q, rule="→ Elimination", premises=[sid("1"), sid("2")])
+    final = stmt("4", Q, rule="Reiteration", premises=[sid("3")])
+
+    user_proof = Proof(
+        premises=[implication],
+        steps=[use_em, apply_impl],
+        conclusions=[final]
+    )
+
+    assert verify_proof(user_proof, registry) is True

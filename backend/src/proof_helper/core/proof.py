@@ -55,6 +55,8 @@ class Subproof(Step):
     steps: List[Step]
     
     def get_step(self, step: StepID) -> Optional[Step]:
+        if self.id.equals(step):
+            return self
         for x in [self.assumption] + self.steps:
             if x.id.contains(step):
                 return x.get_step(step)
