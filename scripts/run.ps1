@@ -24,7 +24,7 @@ npm install
 Write-Host "Starting backend and frontend..."
 
 # Start both and capture jobs
-$backend = Start-Job { proof_server }
+$backend = Start-Job { proof_server --rules-dir "$REPO_ROOT\custom_rules"}
 $frontend = Start-Job { npm run dev --prefix "$using:FRONTEND" }
 
 # Clean up on Ctrl+C

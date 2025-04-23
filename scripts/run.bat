@@ -25,7 +25,7 @@ cd /d "%REPO_ROOT%\frontend"
 call npm install
 
 REM Start backend
-cd /d "%REPO_ROOT%\backend"
+cd /d "%REPO_ROOT%"
 start "Backend" cmd /c proof_server
 
 REM Start frontend

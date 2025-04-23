@@ -25,7 +25,7 @@ npm install
 
 # Step 4: Launch backend and frontend in parallel
 echo "Starting backend (proof_server)..."
-cd "$REPO_ROOT/backend"
+cd "$REPO_ROOT"
 proof_server &
 BACK_PID=$!
 
