@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from proof_helper.logic.rule_registry import RuleRegistry
 from proof_helper.io.deserialize import build_proof
 from proof_helper.io.serialize import dump_proof, dump_formula
@@ -133,5 +134,6 @@ def main():
     args = parser.parse_args()
 
     app = ProofApp(__name__, rules_dir=args.rules_dir)
+    CORS(app)
     register_routes(app)
     app.run(debug=args.debug, port=args.port)
