@@ -39,6 +39,7 @@ export default function Home() {
   }
 
   useEffect(() => {
+    console.log(proof)
     verify();
   }, [proof]);
 

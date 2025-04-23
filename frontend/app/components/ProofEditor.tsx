@@ -31,7 +31,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw: replaceSubstitutions(raw),
       result: parseFormulaInput(replaceSubstitutions(raw)),
       rule: "none",
-      number: index + 1 + "",
+      number: proof.goals[index].number,
       parent: newGoals[index].parent,
     };
     setProof({ ...proof, goals: newGoals });
@@ -44,7 +44,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       raw: newGoals[index].raw,
       result: newGoals[index].result,
       rule: "none",
-      number: index + 1  + "",
+      number: proof.goals[index].number,
       parent: parent,
     };
     setProof({ ...proof, goals: newGoals });

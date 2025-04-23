@@ -22,6 +22,11 @@ export default function StatementEditor({
     onChange({ ...statement, raw, result });
   };
 
+  const changeParents = (parentsRaw: string) => {
+    const newStatement = { ...statement, parentsRaw: parentsRaw, parents: parentsRaw.split(",") };
+    onChange(newStatement);
+  };
+
   return (
     <div className="flex flex-row w-full h-full align-middle gap-2 relative">
       <div className="p-1 text-lg text-center grid items-center justify-center">
@@ -38,7 +43,7 @@ export default function StatementEditor({
       <input
         type="text"
         value={statement.parentsRaw}
-        onChange={(e) => onChange({ ...statement, parentsRaw: e.target.value })}
+        onChange={(e) => changeParents(e.target.value)}
         className="border px-2 py-1 rounded flex-grow-1"
         placeholder="Parents (1,2,3)"
       />

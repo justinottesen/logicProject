@@ -1,6 +1,6 @@
 import { Formula } from "./logic/logic";
 import { ParsedFormula, Proof, Step } from "./logic/proof";
-import { LongRules, rulesFullName, ShortRules } from "./logic/rules";
+import { LongRules, longRuleObjects, ShortRules } from "./logic/rules";
 
 
 export type Converted = {
@@ -24,9 +24,8 @@ type ConvertedStatement = {
 
 type ConvertedSubproof = {
     id: string;
-    formula: ConvertedFormula;
-    rule: "Assumption";
-    premises: string[];
+    type: "subproof";
+    assumption: ConvertedPremise
     steps: ConvertedStep[];
 }
 
@@ -77,7 +76,7 @@ export const convert = (proof: Proof) => {
     }
     for (const conclusion of proof.goals) {
         converted.conclusions.push({
-            id: i + "",
+            id: conclusion.number + "",
             formula: convertToFormula(conclusion.result),
             rule: "Reiteration",
             premises: [conclusion.parent + ""]
@@ -145,19 +144,21 @@ const convertStep = (step: Step): ConvertedStep => {
     if (step.type === "subproof") {
         const convertedStep: ConvertedSubproof = {
             id: step.number + "",
-            premises: [],
-            formula: emptyConvertedFormula,
-            rule: "Assumption",
+            type: "subproof",
+            assumption: {
+                id: step.number + ".1",
+                formula: convertToFormula(step.premise.result),
+                rule: "Assumption"
+            },
             steps: []
         };
-        convertedStep.formula = convertToFormula(step.premise.result);
-        convertedStep.rule = "Assumption";
         for (const substep of step.steps) {
             convertedStep.steps.push(convertStep(substep));
         }
         return convertedStep;
 
     } else if (step.type === "line") {
+        console.table(step.parents)
         const convertedStep: ConvertedStatement = {
             id: step.number + "",
             formula: emptyConvertedFormula,
@@ -173,7 +174,7 @@ const convertStep = (step: Step): ConvertedStep => {
 }
 const convertRule = (rule: ShortRules | "none"):    LongRules => {
     if (rule === "none") throw new Error("Rule is none");
-    return rulesFullName[rule] as LongRules;
+    return longRuleObjects[rule] as LongRules;
 }
 
 

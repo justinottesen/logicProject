@@ -23,7 +23,7 @@ export const number = (proof: Proof) => {
 }
 
 const numberIndex = (subproof: Subproof, index: string) => {
-    let i = 1;
+    let i = 2;
     for (const step of subproof.steps) {
         step.number = index + "." + i;
 

@@ -91,7 +91,7 @@ export default function SubproofEditor({
   return (
     <div className="flex flex-col gap-2 pl-4 sub relative">
       <div className="flex flex-row w-full h-full mb-2 gap-2 align-middle">
-        <div className="h-full p-1 text-lg">{subproof.number}</div>
+        <div className="h-full p-1 text-lg">{subproof.number + ".1"}</div>
         <input
           type="text"
           value={subproof.premise.raw}
