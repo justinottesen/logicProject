@@ -11,14 +11,14 @@ class CustomRuleStore:
 
     def save_rule(self, name: str, raw_json: dict) -> None:
         path = os.path.join(self.directory, f"{name}.json")
-        with open(path, "w") as f:
-            json.dump(raw_json, f, indent=2)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(raw_json, f, indent=2, ensure_ascii=False)
 
     def load_rule(self, name: str) -> Optional[Proof]:
         path = os.path.join(self.directory, f"{name}.json")
         if not os.path.exists(path):
             return None
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             raw = json.load(f)
         return build_proof(raw)
 

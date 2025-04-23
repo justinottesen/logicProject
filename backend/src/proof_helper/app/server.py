@@ -8,6 +8,7 @@ from proof_helper.io.rule_storage import CustomRuleStore
 from typing import Optional
 import argparse
 import traceback
+import json
 
 class ProofApp(Flask):
     def __init__(self, import_name: str, rules_dir: Optional[str] = None):
@@ -19,7 +20,7 @@ def register_routes(app: ProofApp):
     @app.route('/verify_proof', methods=['POST'])
     def verify_proof_api():
         try:
-            data = request.get_json()
+            data = json.loads(request.data.decode())
             proof = build_proof(data)
             rule_checker = app.rule_registry
 
@@ -44,7 +45,7 @@ def register_routes(app: ProofApp):
     @app.route('/rules', methods=['POST'])
     def add_custom_rule_api():
         try:
-            data = request.get_json()
+            data = json.loads(request.data.decode())
             name = data.get("name")
             raw_proof = data.get("proof")
             proof = build_proof(raw_proof)
@@ -91,7 +92,7 @@ def register_routes(app: ProofApp):
     @app.route('/suggest_rules', methods=['POST'])
     def suggest_rules_api():
         try:
-            data = request.get_json()
+            data = json.loads(request.data.decode())
             raw_proof = data.get("proof")
             max_suggestions = data.get("max", 5)
 
