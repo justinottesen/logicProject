@@ -31,18 +31,19 @@ export const rulesFullName: FullNamesObject = {
 };
 
 export const rulesFullNames = [
-    "∧ Elimination",
-    "∨ Elimination",
-    "¬ Elimination",
-    "⊥ Elimination",
-    "→ Elimination",
-    "↔ Elimination",
-    "∧ Introduction",
-    "∨ Introduction",
-    "¬ Introduction",
-    "⊥ Introduction",
-    "→ Introduction",
-    "↔ Introduction",
+    "And Elimination",
+    "Or Elimination",
+    "Not Elimination",
+    "Bottom Elimination",
+    "Implication Elimination",
+    "Biconditional Elimination",
+    "And Introduction",
+    "Or Introduction",
+    "Not Introduction",
+    "Bottom Introduction",
+    "Implication Introduction",
+    "Biconditional Introduction",
 ]
 export type ShortRules = "∧Elim" | "∨Elim" | "¬Elim" | "⊥Elim" | "→Elim" | "↔Elim" | "∧Intro" | "∨Intro" | "¬Intro" | "⊥Intro" | "→Intro" | "↔Intro";
-export type FullNames = "∧ Elimination" | "∨ Elimination" | "¬ Elimination" | "⊥ Elimination" | "→ Elimination" | "↔ Elimination" | "∧ Introduction" | "∨ Introduction" | "¬ Introduction" | "⊥ Introduction" | "→ Introduction" | "↔ Introduction";
+
+export type LongRules = "And Elimination" | "Or Elimination" |  "Not Elimination" | "Bottom Elimination" | "Implication Elimination" | "Biconditional Elimination" | "And Introduction" | "Or Introduction" | "Not Introduction" | "Bottom Introduction" | "Implication Introduction" | "Biconditional Introduction";

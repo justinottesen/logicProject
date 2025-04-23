@@ -1,10 +1,7 @@
 import { Formula } from "./logic/logic";
 import { ParsedFormula, Proof, Step } from "./logic/proof";
-import { FullNames, rulesFullName, ShortRules } from "./logic/rules";
+import { LongRules, rulesFullName, ShortRules } from "./logic/rules";
 
-
-
-type AllRules = FullNames;
 
 export type Converted = {
     premises: ConvertedPremise[];
@@ -21,7 +18,7 @@ type ConvertedPremise = {
 type ConvertedStatement = {
     id: string;
     formula: ConvertedFormula;
-    rule: AllRules;
+    rule: LongRules;
     premises: string[];
 }
 
@@ -80,7 +77,7 @@ export const convert = (proof: Proof) => {
     }
     for (const conclusion of proof.goals) {
         converted.conclusions.push({
-            id: `conclusion${i}`,
+            id: i + "",
             formula: convertToFormula(conclusion.result),
             rule: "Reiteration",
             premises: [conclusion.parent + ""]
@@ -174,9 +171,9 @@ const convertStep = (step: Step): ConvertedStep => {
         throw new Error("Unknown step type");
     }
 }
-const convertRule = (rule: ShortRules | "none"): FullNames => {
+const convertRule = (rule: ShortRules | "none"):    LongRules => {
     if (rule === "none") throw new Error("Rule is none");
-    return rulesFullName[rule] as FullNames;
+    return rulesFullName[rule] as LongRules;
 }
 
 
