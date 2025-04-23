@@ -9,7 +9,7 @@ def stmt(id: str, formula, rule=None, premises=None):
     return Statement(
         id=StepID.from_string(id),
         formula=formula,
-        rule=rule or "∧ Elimination",
+        rule=rule or "And Elimination",
         premises=premises or []
     )
 

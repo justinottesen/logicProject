@@ -23,7 +23,7 @@ def test_serialize_formula_and_not():
 
 def test_serialize_statement():
     f = Or(Variable("A"), Variable("B"))
-    s = stmt("1", f, rule="∨ Introduction", premises=[sid("2")])
+    s = stmt("1", f, rule="Or Introduction", premises=[sid("2")])
     result = dump_statement(s)
 
     assert result == {
@@ -33,13 +33,13 @@ def test_serialize_statement():
             "left": {"type": "var", "name": "A"},
             "right": {"type": "var", "name": "B"}
         },
-        "rule": "∨ Introduction",
+        "rule": "Or Introduction",
         "premises": ["2"]
     }
 
 def test_serialize_subproof():
     assume = stmt("1.1", Variable("P"), rule="Assumption")
-    inner = stmt("1.2", Bottom(), rule="⊥ Introduction", premises=["1.1", "1.1"])
+    inner = stmt("1.2", Bottom(), rule="Bottom Introduction", premises=["1.1", "1.1"])
     sp = Subproof(id=sid("1"), assumption=assume, steps=[inner])
 
     result = dump_subproof(sp)
@@ -54,7 +54,7 @@ def test_serialize_full_proof():
     Q = Variable("Q")
     a = stmt("1", P, rule="Assumption")
     b = stmt("2", Q, rule="Assumption")
-    ab = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    ab = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
     reiterate = stmt("4", And(P, Q), rule="Reiteration", premises=[sid("3")])
 
     proof = Proof(premises=[a, b], steps=[ab], conclusions=[reiterate])
@@ -70,7 +70,7 @@ def test_serialize_roundtrip():
     Q = Variable("Q")
     a = stmt("1", P, rule="Assumption")
     b = stmt("2", Q, rule="Assumption")
-    ab = stmt("3", And(P, Q), rule="∧ Introduction", premises=[sid("1"), sid("2")])
+    ab = stmt("3", And(P, Q), rule="And Introduction", premises=[sid("1"), sid("2")])
     reiterate = stmt("4", And(P, Q), rule="Reiteration", premises=[sid("3")])
 
     original = Proof(premises=[a, b], steps=[ab], conclusions=[reiterate])

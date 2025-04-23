@@ -42,25 +42,25 @@ def test_assumption_with_supports_fails():
 def test_and_intro_valid():
     a = stmt("1", Variable("P"))
     b = stmt("2", Variable("Q"))
-    ab = stmt("3", And(a.formula, b.formula), rule="∧ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    ab = stmt("3", And(a.formula, b.formula), rule="And Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert and_introduction_rule.verify([a, b], ab)
 
 def test_and_intro_wrong_formula():
     a = stmt("1", Variable("P"))
     b = stmt("2", Variable("Q"))
-    bad = stmt("3", Variable("R"), rule="∧ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    bad = stmt("3", Variable("R"), rule="And Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert not and_introduction_rule.verify([a, b], bad)
 
 def test_and_intro_missing_conjunct():
     a = stmt("1", Variable("P"))
     b = stmt("2", Variable("Q"))
-    ab = stmt("3", And(a.formula, Variable("X")), rule="∧ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    ab = stmt("3", And(a.formula, Variable("X")), rule="And Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert not and_introduction_rule.verify([a, b], ab)
 
 def test_and_intro_nested_clause():
     a = stmt("1", Variable("P"))
     b = stmt("2", Or(Variable("Q"), Variable("R")))
-    ab = stmt("3", And(a.formula, b.formula), rule="∧ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    ab = stmt("3", And(a.formula, b.formula), rule="And Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert and_introduction_rule.verify([a, b], ab)
 
 # === OR INTRODUCTION ===
@@ -105,7 +105,7 @@ def test_not_intro_valid():
     contradiction = stmt("1.2", Bottom(), rule="¬E", premises=[StepID.from_string("1.1")])
     sp = subproof("1", assumption, [contradiction])
 
-    conclusion = stmt("2", Not(assumption.formula), rule="¬ Introduction", premises=[StepID.from_string("1")])
+    conclusion = stmt("2", Not(assumption.formula), rule="Not Introduction", premises=[StepID.from_string("1")])
     assert not_introduction_rule.verify([sp], conclusion)
 
 def test_not_intro_fails_with_no_bottom():
@@ -113,7 +113,7 @@ def test_not_intro_fails_with_no_bottom():
     unrelated = stmt("1.2", Variable("Q"), rule="Assumption")
     sp = subproof("1", assumption, [unrelated])
 
-    conclusion = stmt("2", Not(assumption.formula), rule="¬ Introduction", premises=[StepID.from_string("1")])
+    conclusion = stmt("2", Not(assumption.formula), rule="Not Introduction", premises=[StepID.from_string("1")])
     assert not not_introduction_rule.verify([sp], conclusion)
 
 def test_not_intro_wrong_conclusion():
@@ -121,7 +121,7 @@ def test_not_intro_wrong_conclusion():
     contradiction = stmt("1.2", Bottom(), rule="¬E", premises=[StepID.from_string("1.1")])
     sp = subproof("1", assumption, [contradiction])
 
-    wrong_conclusion = stmt("2", Variable("Q"), rule="¬ Introduction", premises=[StepID.from_string("1")])
+    wrong_conclusion = stmt("2", Variable("Q"), rule="Not Introduction", premises=[StepID.from_string("1")])
     assert not not_introduction_rule.verify([sp], wrong_conclusion)
 
 def test_not_intro_wrong_assumption():
@@ -129,18 +129,18 @@ def test_not_intro_wrong_assumption():
     contradiction = stmt("1.2", Bottom(), rule="¬E", premises=[StepID.from_string("1.1")])
     sp = subproof("1", assumption, [contradiction])
 
-    conclusion = stmt("2", Not(Variable("P")), rule="¬ Introduction", premises=[StepID.from_string("1")])
+    conclusion = stmt("2", Not(Variable("P")), rule="Not Introduction", premises=[StepID.from_string("1")])
     assert not not_introduction_rule.verify([sp], conclusion)
 
 def test_not_intro_support_is_not_subproof():
     fake_support = stmt("1", Variable("P"), rule="¬E")
-    conclusion = stmt("2", Not(Variable("P")), rule="¬ Introduction", premises=[StepID.from_string("1")])
+    conclusion = stmt("2", Not(Variable("P")), rule="Not Introduction", premises=[StepID.from_string("1")])
     assert not not_introduction_rule.verify([fake_support], conclusion)
 
 def test_not_intro_multiple_supports_invalid():
     a = stmt("1", Variable("P"))
     b = stmt("2", Variable("Q"))
-    conclusion = stmt("3", Not(Variable("R")), rule="¬ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    conclusion = stmt("3", Not(Variable("R")), rule="Not Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert not not_introduction_rule.verify([a, b], conclusion)
 
 # === BOTTOM INTRODUCTION ===
@@ -196,14 +196,14 @@ def test_conditional_intro_valid():
     conclusion = stmt("1.2", q)
     sp = subproof("1", assume, [conclusion])
 
-    outer = stmt("2", Implies(p, q), rule="→ Introduction", premises=[StepID.from_string("1")])
+    outer = stmt("2", Implies(p, q), rule="Implication Introduction", premises=[StepID.from_string("1")])
     assert conditional_introduction_rule.verify([sp], outer)
 
 def test_conditional_intro_empty_subproof():
     assume = stmt("1.1", Variable("P"))
     sp = subproof("1", assume, [])
 
-    outer = stmt("2", Implies(assume.formula, Variable("Q")), rule="→ Introduction", premises=[StepID.from_string("1")])
+    outer = stmt("2", Implies(assume.formula, Variable("Q")), rule="Implication Introduction", premises=[StepID.from_string("1")])
     assert not conditional_introduction_rule.verify([sp], outer)
 
 def test_conditional_intro_subproof_does_not_end_with_statement():
@@ -213,7 +213,7 @@ def test_conditional_intro_subproof_does_not_end_with_statement():
     assume = stmt("1.1", Variable("P"))
     sp = subproof("1", assume, [FakeStep()])
 
-    outer = stmt("2", Implies(assume.formula, Variable("Q")), rule="→ Introduction", premises=[StepID.from_string("1")])
+    outer = stmt("2", Implies(assume.formula, Variable("Q")), rule="Implication Introduction", premises=[StepID.from_string("1")])
     assert not conditional_introduction_rule.verify([sp], outer)
 
 def test_conditional_intro_wrong_formula():
@@ -224,7 +224,7 @@ def test_conditional_intro_wrong_formula():
     conclusion = stmt("1.2", q)
     sp = subproof("1", assume, [conclusion])
 
-    wrong = stmt("2", Variable("X"), rule="→ Introduction", premises=[StepID.from_string("1")])
+    wrong = stmt("2", Variable("X"), rule="Implication Introduction", premises=[StepID.from_string("1")])
     assert not conditional_introduction_rule.verify([sp], wrong)
 
 def test_conditional_intro_not_subproof():
@@ -232,13 +232,13 @@ def test_conditional_intro_not_subproof():
     q = Variable("Q")
 
     fake_support = stmt("1", p)
-    conclusion = stmt("2", Implies(p, q), rule="→ Introduction", premises=[StepID.from_string("1")])
+    conclusion = stmt("2", Implies(p, q), rule="Implication Introduction", premises=[StepID.from_string("1")])
     assert not conditional_introduction_rule.verify([fake_support], conclusion)
 
 def test_conditional_intro_too_many_supports():
     a = stmt("1", Variable("P"))
     b = stmt("2", Variable("Q"))
-    outer = stmt("3", Implies(a.formula, b.formula), rule="→ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    outer = stmt("3", Implies(a.formula, b.formula), rule="Implication Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert not conditional_introduction_rule.verify([a, b], outer)
 
 # === BICONDITIONAL INTRODUCTION TESTS ===
@@ -250,7 +250,7 @@ def test_biconditional_intro_valid():
     sp1 = subproof("1", stmt("1.1", p), [stmt("1.2", q)])
     sp2 = subproof("2", stmt("2.1", q), [stmt("2.2", p)])
 
-    conclusion = stmt("3", Iff(p, q), rule="↔ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    conclusion = stmt("3", Iff(p, q), rule="Biconditional Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert biconditional_introduction_rule.verify([sp1, sp2], conclusion)
 
 def test_biconditional_intro_valid_reversed():
@@ -260,7 +260,7 @@ def test_biconditional_intro_valid_reversed():
     sp1 = subproof("1", stmt("1.1", q), [stmt("1.2", p)])
     sp2 = subproof("2", stmt("2.1", p), [stmt("2.2", q)])
 
-    conclusion = stmt("3", Iff(q, p), rule="↔ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    conclusion = stmt("3", Iff(q, p), rule="Biconditional Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert biconditional_introduction_rule.verify([sp1, sp2], conclusion)
 
 def test_biconditional_intro_mismatched_formula():
@@ -271,7 +271,7 @@ def test_biconditional_intro_mismatched_formula():
     sp1 = subproof("1", stmt("1.1", p), [stmt("1.2", q)])
     sp2 = subproof("2", stmt("2.1", q), [stmt("2.2", p)])
 
-    wrong = stmt("3", Iff(p, r), rule="↔ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    wrong = stmt("3", Iff(p, r), rule="Biconditional Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert not biconditional_introduction_rule.verify([sp1, sp2], wrong)
 
 def test_biconditional_intro_invalid_structure():
@@ -282,18 +282,18 @@ def test_biconditional_intro_invalid_structure():
     sp1 = subproof("1", stmt("1.1", p), [])
     sp2 = subproof("2", stmt("2.1", q), [stmt("2.2", p)])
 
-    conclusion = stmt("3", Iff(p, q), rule="↔ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    conclusion = stmt("3", Iff(p, q), rule="Biconditional Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert not biconditional_introduction_rule.verify([sp1, sp2], conclusion)
 
 def test_biconditional_intro_wrong_support_types():
     a = stmt("1", Variable("P"))
     b = stmt("2", Variable("Q"))
-    conclusion = stmt("3", Iff(a.formula, b.formula), rule="↔ Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
+    conclusion = stmt("3", Iff(a.formula, b.formula), rule="Biconditional Introduction", premises=[StepID.from_string("1"), StepID.from_string("2")])
     assert not biconditional_introduction_rule.verify([a, b], conclusion)
 
 def test_biconditional_intro_wrong_number_of_supports():
     p = Variable("P")
     q = Variable("Q")
     sp1 = subproof("1", stmt("1.1", p), [stmt("1.2", q)])
-    conclusion = stmt("2", Iff(p, q), rule="↔ Introduction", premises=[StepID.from_string("1")])
+    conclusion = stmt("2", Iff(p, q), rule="Biconditional Introduction", premises=[StepID.from_string("1")])
     assert not biconditional_introduction_rule.verify([sp1], conclusion)

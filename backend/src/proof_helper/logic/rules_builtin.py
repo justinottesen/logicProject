@@ -45,7 +45,7 @@ class ReiterationRule(Rule):
 
 class AndIntroductionRule(Rule):
     def name(self) -> str:
-        return "∧ Introduction"
+        return "And Introduction"
 
     def num_supports(self) -> Optional[int]:
         return None  # variable number of conjuncts allowed
@@ -87,7 +87,7 @@ class AndIntroductionRule(Rule):
 
 class OrIntroductionRule(Rule):
     def name(self) -> str:
-        return "∨ Introduction"
+        return "Or Introduction"
 
     def num_supports(self) -> Optional[int]:
         return 1
@@ -142,7 +142,7 @@ class OrIntroductionRule(Rule):
 
 class NotIntroductionRule(Rule):
     def name(self) -> str:
-        return "¬ Introduction"
+        return "Not Introduction"
 
     def num_supports(self) -> Optional[int]:
         return 1
@@ -179,7 +179,7 @@ class NotIntroductionRule(Rule):
     
 class BottomIntroductionRule(Rule):
     def name(self) -> str:
-        return "⊥ Introduction"
+        return "Bottom Introduction"
 
     def num_supports(self) -> Optional[int]:
         return 2
@@ -208,7 +208,7 @@ class BottomIntroductionRule(Rule):
 
 class ConditionalIntroductionRule(Rule):
     def name(self) -> str:
-        return "→ Introduction"
+        return "Implication Introduction"
 
     def num_supports(self) -> Optional[int]:
         return 1
@@ -241,7 +241,7 @@ class ConditionalIntroductionRule(Rule):
 
 class BiconditionalIntroductionRule(Rule):
     def name(self) -> str:
-        return "↔ Introduction"
+        return "Biconditional Introduction"
 
     def num_supports(self) -> Optional[int]:
         return 2
@@ -285,7 +285,7 @@ class BiconditionalIntroductionRule(Rule):
 
 class AndEliminationRule(Rule):
     def name(self) -> str:
-        return "∧ Elimination"
+        return "And Elimination"
 
     def num_supports(self) -> Optional[int]:
         return 1
@@ -324,7 +324,7 @@ class AndEliminationRule(Rule):
 
 class OrEliminationRule(Rule):
     def name(self) -> str:
-        return "∨ Elimination"
+        return "Or Elimination"
 
     def num_supports(self) -> Optional[int]:
         return None  # variable number of subproofs
@@ -389,7 +389,7 @@ class OrEliminationRule(Rule):
 
 class NotEliminationRule(Rule):
     def name(self) -> str:
-        return "¬ Elimination"
+        return "Not Elimination"
 
     def num_supports(self) -> Optional[int]:
         return 1
@@ -418,7 +418,7 @@ class NotEliminationRule(Rule):
 
 class BottomEliminationRule(Rule):
     def name(self) -> str:
-        return "⊥ Elimination"
+        return "Bottom Elimination"
 
     def num_supports(self) -> Optional[int]:
         return 1
@@ -441,7 +441,7 @@ class BottomEliminationRule(Rule):
 
 class ConditionalEliminationRule(Rule):
     def name(self) -> str:
-        return "→ Elimination"
+        return "Implication Elimination"
 
     def num_supports(self) -> Optional[int]:
         return 2
@@ -487,7 +487,7 @@ class ConditionalEliminationRule(Rule):
 
 class BiconditionalEliminationRule(Rule):
     def name(self) -> str:
-        return "↔ Elimination"
+        return "Biconditional Elimination"
 
     def num_supports(self) -> Optional[int]:
         return 2
