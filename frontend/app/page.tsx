@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ProofEditor from "./components/ProofEditor";
 import { Proof } from "./lib/logic/proof";
 import { number } from "./lib/logic/numberSteps";
-import { convert } from "./lib/convert";
+import { convert, Converted } from "./lib/convert";
 import { verifyProof } from "./lib/api";
 import { getErrorMessage } from "./lib/parser";
 
@@ -22,11 +22,17 @@ export default function Home() {
   };
 
   async function verify() {
+    let converted: Converted | null = null;
     try {
-      const converted = convert(proof);
-      console.log("Converted proof:", converted);
+      converted = convert(proof);
+    } catch (error) {
+      console.log("Error converting proof:", getErrorMessage(error));
+    }
+    try {
+      if (!converted) return;
+      console.log(JSON.stringify(converted));
       const verify = await verifyProof(converted);
-      // console.log(verify);
+      console.log(verify);
     } catch (error) {
       console.log("Error verifying proof:", getErrorMessage(error));
     }

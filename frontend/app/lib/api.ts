@@ -4,7 +4,6 @@ export async function verifyProof(proof: object): Promise<{ valid: true } | { va
       headers: {
         "Content-Type": "application/json",
       },
-      mode: "no-cors",
       body: JSON.stringify(proof),
     });
   
