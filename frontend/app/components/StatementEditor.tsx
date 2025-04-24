@@ -3,6 +3,7 @@ import { Statement, Step } from "@lib/logic/proof";
 import { rules, ShortRules } from "@lib/logic/rules";
 import { replaceSubstitutions } from "@/lib/logic/substitutions";
 import { useState } from "react";
+import CustomRules from "@/lib/CustomRules";
 
 type StatementEditorProps = {
   statement: Statement;
@@ -23,7 +24,11 @@ export default function StatementEditor({
   };
 
   const changeParents = (parentsRaw: string) => {
-    const newStatement = { ...statement, parentsRaw: parentsRaw, parents: parentsRaw.split(",") };
+    const newStatement = {
+      ...statement,
+      parentsRaw: parentsRaw,
+      parents: parentsRaw.split(","),
+    };
     onChange(newStatement);
   };
 
@@ -50,10 +55,17 @@ export default function StatementEditor({
 
       <select
         value={statement.rule}
-        onChange={(e) => onChange({ ...statement, rule: e.target.value as ShortRules })}
+        onChange={(e) =>
+          onChange({ ...statement, rule: e.target.value as ShortRules })
+        }
         className="border px-2 py-1 rounded ml-2"
       >
         {rules.map((rule) => (
+          <option key={"statment-rule-" + rule} value={rule}>
+            {rule}
+          </option>
+        ))}
+        {CustomRules.rules.map((rule) => (
           <option key={"statment-rule-" + rule} value={rule}>
             {rule}
           </option>
