@@ -111,6 +111,7 @@ def register_routes(app: ProofApp):
             top = sorted(suggestions, key=lambda s: -s[1])[:max_suggestions]
             formatted = [{
                 "formula": dump_formula(s.formula),
+                "str_formlua": str(s.formula),
                 "rule": s.rule,
                 "premises": [str(p) for p in s.premises],
                 "score": score
