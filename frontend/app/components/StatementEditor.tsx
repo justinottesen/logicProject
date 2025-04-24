@@ -32,6 +32,11 @@ export default function StatementEditor({
     onChange(newStatement);
   };
 
+  const changeRule = (rule: string) => {
+    const newStatement = { ...statement, rule: rule };
+    onChange(newStatement);
+  };
+
   return (
     <div className="flex flex-row w-full h-full align-middle gap-2 relative">
       <div className="p-1 text-lg text-center grid items-center justify-center">
@@ -55,9 +60,7 @@ export default function StatementEditor({
 
       <select
         value={statement.rule}
-        onChange={(e) =>
-          onChange({ ...statement, rule: e.target.value as ShortRules })
-        }
+        onChange={(e) => changeRule(e.target.value)}
         className="border px-2 py-1 rounded ml-2"
       >
         {rules.map((rule) => (

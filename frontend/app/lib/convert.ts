@@ -1,6 +1,6 @@
 import { Formula } from "./logic/logic";
 import { ParsedFormula, Proof, Step } from "./logic/proof";
-import { LongRules, longRuleObjects, ShortRules } from "./logic/rules";
+import { LongRules, longRuleObjects, ShortRules, rules } from "./logic/rules";
 
 
 export type Converted = {
@@ -18,7 +18,7 @@ type ConvertedPremise = {
 type ConvertedStatement = {
     id: string;
     formula: ConvertedFormula;
-    rule: LongRules;
+    rule: string;
     premises: string[];
 }
 
@@ -166,11 +166,18 @@ const convertStep = (step: Step): ConvertedStep => {
         return convertedStep;
 
     } else if (step.type === "line") {
+        let found = false;
+        rules.forEach(rule => {
+            if (rule === step.rule) {
+                found = true;
+            }
+        })
+        const rule = found ? convertRule(step.rule as ShortRules) : step.rule;
         const convertedStep: ConvertedStatement = {
             id: step.number + "",
             formula: emptyConvertedFormula,
-            rule: convertRule(step.rule),
-            premises: step.parents.map((parent) => parent + "")
+            rule: rule,
+            premises: step.parents.filter((parent) => parent !== "").map((parent) => parent + "")
         };
         convertedStep.formula = convertToFormula(step.result);
         return convertedStep;

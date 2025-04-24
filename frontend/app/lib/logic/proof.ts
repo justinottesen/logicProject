@@ -16,7 +16,7 @@ export type Statement = {
   type: "line";
   raw: string;
   result: ParsedFormula;
-  rule: ShortRules | "none";
+  rule: string;
   parents: string[];
   parentsRaw: string;
   number: string;

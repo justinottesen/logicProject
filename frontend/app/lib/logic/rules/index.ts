@@ -1,4 +1,4 @@
-export const rules = [
+export const rules: ShortRules[] = [
     "∧Elim",
     "∨Elim",
     "¬Elim",
