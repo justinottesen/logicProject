@@ -134,7 +134,7 @@ export default function Home() {
                     key={suggestion.rule + index}
                   >
                     <p className="col-span-2">
-                      {JSON.stringify(suggestion.formula)}
+                      {suggestion.str_formula}
                     </p>
                     <p>{suggestion.rule}</p>
                     <p>{suggestion.score}</p>
