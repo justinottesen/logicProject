@@ -2,6 +2,7 @@ from proof_helper.core.proof import Proof, Step, Statement
 from proof_helper.core.formula import Formula
 from proof_helper.logic.rules_base import Rule
 from typing import List, Optional
+from itertools import permutations
 
 class CustomRule(Rule):
     def __init__(self, name: str, proof: Proof):
@@ -24,16 +25,30 @@ class CustomRule(Rule):
     def verify(self, supports: List[Step], statement: Statement) -> bool:
         if not self.is_applicable(supports):
             return False
+        
+        # Special case: no-premise rule (supports must be empty)
+        if not self.premises and not supports:
+            return any(statement.formula.match(c.formula, {}) for c in self.conclusions)
 
-        given_formulas = {s.formula for s in supports}
-        expected_formulas = {p.formula for p in self.premises}
-
-        if given_formulas != expected_formulas:
-            return False
-
-        return any(statement.formula == c.formula for c in self.conclusions)
+        # Try all permutations of supports matched to premises
+        for perm in permutations(supports, len(self.premises)):
+            subst: dict[str, Formula] = {}
+            if all(prem.formula.match(sup.formula, subst) for prem, sup in zip(self.premises, perm)):
+                for concl in self.conclusions:
+                    if concl.formula.substitute(subst) == statement.formula:
+                        return True
+        return False
     
     def conclude(self, supports: list[Step]) -> list[Formula]:
         if not self.is_applicable(supports):
             return []
-        return [c.formula for c in self.conclusions]
+        
+        # Special case: no-premise rule (supports must be empty)
+        if not self.premises and not supports:
+            return [c.formula for c in self.conclusions]
+
+        for perm in permutations(supports, len(self.premises)):
+            subst: dict[str, Formula] = {}
+            if all(prem.formula.match(sup.formula, subst) for prem, sup in zip(self.premises, perm)):
+                return [concl.formula.substitute(subst) for concl in self.conclusions]
+        return []

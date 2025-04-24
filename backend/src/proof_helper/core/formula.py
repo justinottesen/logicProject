@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, Dict
 
 # === Base Formatting Helper ===
 
@@ -24,6 +24,15 @@ class Variable:
 
     def __repr__(self) -> str:
         return self._to_string(0)
+    
+    def match(self, other: Formula, subst: Dict[str, Formula]) -> bool:
+        if self.name in subst:
+            return subst[self.name] == other
+        subst[self.name] = other
+        return True
+    
+    def substitute(self, subst: dict[str, Formula]) -> Formula:
+        return subst.get(self.name, self)
 
 @dataclass(frozen=True)
 class Bottom:
@@ -38,6 +47,12 @@ class Bottom:
 
     def __repr__(self) -> str:
         return self._to_string(0)
+    
+    def match(self, other: Formula, subst: dict[str, Formula]) -> bool:
+        return isinstance(other, Bottom)
+    
+    def substitute(self, subst: dict[str, Formula]) -> Formula:
+        return self
 
 @dataclass(frozen=True)
 class Not:
@@ -55,6 +70,13 @@ class Not:
 
     def __repr__(self) -> str:
         return self._to_string(0)
+    
+    def match(self, other: Formula, subst: dict[str, Formula]) -> bool:
+        return isinstance(other, Not) and \
+               self.value.match(other.value, subst)
+    
+    def substitute(self, subst: dict[str, Formula]) -> Formula:
+        return Not(self.value.substitute(subst))
 
 @dataclass(frozen=True)
 class And:
@@ -75,6 +97,14 @@ class And:
 
     def __repr__(self) -> str:
         return self._to_string(0)
+    
+    def match(self, other: Formula, subst: dict[str, Formula]) -> bool:
+        return isinstance(other, And) and \
+               self.left.match(other.left, subst) and \
+               self.right.match(other.right, subst)
+
+    def substitute(self, subst: dict[str, Formula]) -> Formula:
+        return And(self.left.substitute(subst), self.right.substitute(subst))
 
 @dataclass(frozen=True)
 class Or:
@@ -95,6 +125,14 @@ class Or:
 
     def __repr__(self) -> str:
         return self._to_string(0)
+    
+    def match(self, other: Formula, subst: dict[str, Formula]) -> bool:
+        return isinstance(other, Or) and \
+               self.left.match(other.left, subst) and \
+               self.right.match(other.right, subst)
+    
+    def substitute(self, subst: dict[str, Formula]) -> Formula:
+        return Or(self.left.substitute(subst), self.right.substitute(subst))
 
 @dataclass(frozen=True)
 class Implies:
@@ -115,6 +153,14 @@ class Implies:
 
     def __repr__(self) -> str:
         return self._to_string(0)
+    
+    def match(self, other: Formula, subst: dict[str, Formula]) -> bool:
+        return isinstance(other, Implies) and \
+               self.left.match(other.left, subst) and \
+               self.right.match(other.right, subst)
+    
+    def substitute(self, subst: dict[str, Formula]) -> Formula:
+        return Implies(self.left.substitute(subst), self.right.substitute(subst))
 
 @dataclass(frozen=True)
 class Iff:
@@ -135,6 +181,14 @@ class Iff:
 
     def __repr__(self) -> str:
         return self._to_string(0)
+    
+    def match(self, other: Formula, subst: dict[str, Formula]) -> bool:
+        return isinstance(other, Iff) and \
+               self.left.match(other.left, subst) and \
+               self.right.match(other.right, subst)
+    
+    def substitute(self, subst: dict[str, Formula]) -> Formula:
+        return Or(self.left.substitute(subst), self.right.substitute(subst))
 
 # Final union
 Formula = Union[Variable, Not, And, Or, Implies, Iff, Bottom]
