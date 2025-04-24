@@ -49,16 +49,10 @@ export default function Home() {
   }
 
   async function setCustomRules() {
-    let converted: Converted | null = null;
     try {
-      converted = convert(proof);
-    } catch (error) {
-      console.log("Error converting proof:", getErrorMessage(error));
-    }
-    if (!converted) return;
-    try {
-      const rules = await addRule(converted, customRuleName);
-      console.log(rules);
+      const rules = await getRules();
+      CustomRules.rules = rules.custom;
+      console.log(CustomRules.rules);
     } catch (error) {
       console.log("Error getting rules:", getErrorMessage(error));
     }
@@ -80,8 +74,16 @@ export default function Home() {
   }, [proof]);
 
   async function addCustomRule() {
+    let converted: Converted | null = null;
     try {
-      addRule(proof, customRuleName);
+      converted = convert(proof);
+    } catch (error) {
+      console.log("Error converting proof:", getErrorMessage(error));
+    }
+    if (!converted) return;
+    try {
+      addRule(converted, customRuleName);
+      setAddingCustomRule(false);
     } catch (error) {
       console.log("Error adding rule:", getErrorMessage(error));
     }
