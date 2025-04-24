@@ -18,7 +18,7 @@ export default function Home() {
   });
 
   const [valid, setValid] = useState<boolean>(false);
-  const [suggestions, setSuggestions] = useState<string>("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [addingCustomRule, setAddingCustomRule] = useState<boolean>(false);
   const [customRuleName, setCustomRuleName] = useState<string>("");
@@ -126,8 +126,21 @@ export default function Home() {
           </button>
         </div>
         {showSuggestions && (
-          <div className="bg-blue-500 text-white text-xl font-bold px-2 py-1 rounded">
-            {suggestions ? suggestions : "No suggestions"}
+          <div className="bg-blue-500 text-white text-xl font-bold px-2 py-1 rounded flex flex-col gap-4">
+            {suggestions.length
+              ? suggestions.map((suggestion, index) => (
+                  <div
+                    className="grid grid-cols-4 justify-between"
+                    key={suggestion.rule + index}
+                  >
+                    <p className="col-span-2">
+                      {JSON.stringify(suggestion.formula)}
+                    </p>
+                    <p>{suggestion.rule}</p>
+                    <p>{suggestion.score}</p>
+                  </div>
+                ))
+              : "No suggestions"}
           </div>
         )}
         {addingCustomRule && (

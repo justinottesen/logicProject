@@ -58,18 +58,18 @@ export async function addRule(proof: object, string: string): Promise<{ valid: t
   }
 }
 
-export async function suggestRules(proof: object): Promise<string> {
+export async function suggestRules(proof: object): Promise<string[]> {
   const res = await fetch("http://localhost:5000/suggest_rules", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(proof),
+    body: JSON.stringify({proof, max: 5}),
   });
 
   if (res.ok) {
     return res.json();
   } else {
-    return ""
+    return []
   }
 }
