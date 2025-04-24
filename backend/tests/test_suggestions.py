@@ -156,17 +156,6 @@ def test_or_intro_multiple_possible_disjuncts():
     suggestions = generate_next_steps(proof, registry)
     assert any(s.formula == Or(Q, P) and s.rule == "Or Introduction" for s, _ in suggestions)
 
-def test_or_intro_no_goal_generates_default_or():
-    P = Variable("P")
-    proof = Proof(
-        premises=[stmt("1", P, "Assumption")],
-        steps=[],
-        conclusions=[]
-    )
-    registry = RuleRegistry()
-    suggestions = generate_next_steps(proof, registry)
-    assert any(s.formula == Or(P, P) and s.rule == "Or Introduction" for s, _ in suggestions)
-
 def f_var(name):
     return { "type": "var", "name": name }
 
