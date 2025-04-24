@@ -50,4 +50,4 @@ def generate_next_steps(proof: Proof, registry: RuleRegistry) -> List[Tuple[Stat
                 suggestions.append((stmt, score))
 
     suggestions.sort(key=lambda pair: -pair[1])
-    return suggestions
+    return list(filter(lambda pair: pair[1] != 0, suggestions))
