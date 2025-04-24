@@ -37,9 +37,30 @@ export async function getRules(): Promise<{
   }
 }
 
+export async function addRule(proof: object, string: string): Promise<{ valid: true } | { valid: false; error: string }> {
+  const body = JSON.stringify({ proof, name: string });
+  const res = await fetch("http://localhost:5000/rules", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body
+  });
+
+  if (res.ok) {
+    return { valid: true };
+  } else {
+    const error = await res.json();
+    return {
+      valid: false,
+      error: error
+    };
+  }
+}
+
 export async function suggestRules(): Promise<string> {
   const res = await fetch("http://localhost:5000/suggest_rules", {
-    method: "GET",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },

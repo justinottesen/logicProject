@@ -5,7 +5,7 @@ import ProofEditor from "./components/ProofEditor";
 import { Proof } from "./lib/logic/proof";
 import { number } from "./lib/logic/numberSteps";
 import { convert, Converted } from "./lib/convert";
-import { getRules, suggestRules, verifyProof } from "./lib/api";
+import { addRule, getRules, suggestRules, verifyProof } from "./lib/api";
 import { getErrorMessage } from "./lib/parser";
 import CustomRules from "./lib/CustomRules";
 
@@ -20,6 +20,8 @@ export default function Home() {
   const [valid, setValid] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string>("");
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [addingCustomRule, setAddingCustomRule] = useState<boolean>(false);
+  const [customRuleName, setCustomRuleName] = useState<string>("");
 
   const changeProof = (newProof: Proof, changeNumber?: boolean) => {
     if (changeNumber) number(newProof);
@@ -47,6 +49,7 @@ export default function Home() {
   }
 
   async function setCustomRules() {
+    console.log("Setting custom rules");
     try {
       const rules = await getRules();
       CustomRules.rules = rules.custom;
@@ -59,6 +62,7 @@ export default function Home() {
   async function getSuggestions() {
     try {
       const rules = await suggestRules();
+      setSuggestions(rules);
     } catch (error) {
       console.log("Error getting rules:", getErrorMessage(error));
     }
@@ -70,10 +74,18 @@ export default function Home() {
     getSuggestions();
   }, [proof]);
 
+  async function addCustomRule() {
+    try {
+      addRule(proof, customRuleName);
+    } catch (error) {
+      console.log("Error adding rule:", getErrorMessage(error));
+    }
+  }
+
   return (
     <div className="flex flex-col w-full min-h-screen">
       <section className="flex-1 border p-4 overflow-auto relative">
-        <div className="grid grid-cols-3 text-center gap-4 mb-4">
+        <div className="grid grid-cols-4 text-center gap-4 mb-4">
           <h2 className="text-2xl font-bold py-2">Proof</h2>
           {valid ? (
             <div className="bg-green-500 text-white text-2xl font-bold px-2 py-2 rounded">
@@ -91,10 +103,38 @@ export default function Home() {
           >
             {showSuggestions ? "Hide" : "Show"} suggestions
           </button>
+
+          <button
+            className="bg-blue-500 text-white text-xl font-bold px-2 py-1 rounded"
+            onClick={(e) => setAddingCustomRule(!addingCustomRule)}
+          >
+            {addingCustomRule ? "Hide" : "Add"} custom rule
+          </button>
         </div>
         {showSuggestions && (
           <div className="bg-blue-500 text-white text-xl font-bold px-2 py-1 rounded">
             {suggestions ? suggestions : "No suggestions"}
+          </div>
+        )}
+        {addingCustomRule && (
+          <div className="bg-blue-500 text-xl font-bold px-2 py-1 rounded flex flex-row justify-center gap-2">
+            <input
+              type="text"
+              placeholder="Add custom rule"
+              onChange={(e) => {
+                setCustomRuleName(e.target.value);
+              }}
+              className="flex-grow-3 text-black border border-gray-300 rounded-md px-2 py-1"
+            />
+            <button
+              className="bg-blue-500 text-white text-xl font-bold px-2 py-1 rounded flex-grow-2"
+              onClick={() => {
+                addCustomRule();
+                setAddingCustomRule(false);
+              }}
+            >
+              Add
+            </button>
           </div>
         )}
         <ProofEditor proof={proof} setProof={changeProof} />
