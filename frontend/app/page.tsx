@@ -59,11 +59,18 @@ export default function Home() {
   }
 
   async function getSuggestions() {
+    let converted: Converted | null = null;
     try {
-      const rules = await suggestRules();
-      setSuggestions(rules);
+      converted = convert(proof);
     } catch (error) {
-      console.log("Error getting rules:", getErrorMessage(error));
+      console.log("Error converting proof:", getErrorMessage(error));
+    }
+    if (!converted) return;
+    try {
+      const suggestions = await suggestRules(converted);
+      setSuggestions(suggestions);
+    } catch (error) {
+      console.log("Error getting suggestions:", getErrorMessage(error));
     }
   }
 
