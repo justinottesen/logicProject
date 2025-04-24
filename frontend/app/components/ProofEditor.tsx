@@ -45,7 +45,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       result: newGoals[index].result,
       rule: "none",
       number: proof.goals[index].number,
-      parent: parent,
+      parent: parent || "0",
     };
     setProof({ ...proof, goals: newGoals });
   };
@@ -74,7 +74,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
       result: parseFormulaInput(""),
       rule: "none",
       number: "",
-      parent: "",
+      parent: "0",
     } as Goal;
     setProof(
       {
@@ -232,7 +232,7 @@ export default function ProofEditor({ proof, setProof }: ProofEditorProps) {
               />
               <input
                 type="text"
-                value={g.parent}
+                value={g.parent != "0" ? g.parent : ""}
                 onChange={(e) => updateGoalParent(i, e.target.value)}
                 className="border px-2 py-1 flex-grow-1 rounded w-full"
                 placeholder={`Parent ${i + 1}`}
