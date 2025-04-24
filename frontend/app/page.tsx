@@ -49,11 +49,16 @@ export default function Home() {
   }
 
   async function setCustomRules() {
-    console.log("Setting custom rules");
+    let converted: Converted | null = null;
     try {
-      const rules = await getRules();
-      CustomRules.rules = rules.custom;
-      console.log(CustomRules.rules);
+      converted = convert(proof);
+    } catch (error) {
+      console.log("Error converting proof:", getErrorMessage(error));
+    }
+    if (!converted) return;
+    try {
+      const rules = await addRule(converted, customRuleName);
+      console.log(rules);
     } catch (error) {
       console.log("Error getting rules:", getErrorMessage(error));
     }
